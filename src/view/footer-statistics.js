@@ -1,3 +1,8 @@
+import {formatNumber, getRandomInteger} from '../utils';
+
+const MAX_FILMS_QUANTITY = 100000;
+
 export const createFooterStatisticsTemplate = () => {
-  return '<p>130 291 movies inside</p>';
+  return `<p> ${formatNumber(getRandomInteger(1000, MAX_FILMS_QUANTITY))} movies inside</p>`;
 };
+
