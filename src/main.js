@@ -19,20 +19,47 @@ const EXTRA_MOCK_FILMS_QUANTITY = 2;
 const FILMS_PER_STEP = 5;
 
 
-const renderFilmCards = (section, quantity, mocks, start = 0) => {
+const renderFilmCards = (section, mocks) => {
   const containerElement = section.querySelector('.films-list__container');
-  for (let i = start; i < quantity; i++) {
+  for (let i = 0; i < mocks.length; i++) {
     render(containerElement, createFilmCardTemplate(mocks[i]), 'beforeend');
   }
+};
+
+const getMostCommentedFilms = (films) => {
+  return films.sort((a, b) => {
+    return b.idComments.length - a.idComments.length;
+  }).slice(0, EXTRA_MOCK_FILMS_QUANTITY);
+};
+
+const getTopRatedFilms = (films) => {
+  return films.sort((a, b) => {
+    return b.rating - a.rating;
+  }).slice(0, EXTRA_MOCK_FILMS_QUANTITY);
 };
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
+const getNextRenderCardIterator = (filmsData) => {
+  const cardAmount = filmsData.length;
+  let renderedCardCount = 0;
+  const renderItemAmount = 5;
+  return {
+    next() {
+      const value = filmsData.slice(renderedCardCount, renderItemAmount + renderedCardCount);
+      renderedCardCount += renderItemAmount;
+      const done = renderedCardCount >= cardAmount;
+      return {value, done};
+    },
+  };
+};
+
 // создание моковых массивов
 const mockFilms = new Array(MOCK_FILMS_QUANTITY).fill().map(generateFilm);
-const extraMockFilms = new Array(EXTRA_MOCK_FILMS_QUANTITY).fill().map(generateFilm);
+const mockTopRatedFilms = getTopRatedFilms(mockFilms);
+const mockMostCommentedFilms = getMostCommentedFilms(mockFilms);
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -54,19 +81,22 @@ const filmsElement = siteMainElement.querySelector('.films');
 render(filmsElement, createFilmsListTemplate(), 'beforeend');
 const filmsListElement = filmsElement.querySelector('.films-list');
 
-if (mockFilms.length > FILMS_PER_STEP) {
-  let renderedFilmsCount = FILMS_PER_STEP;
+const iterator = getNextRenderCardIterator(mockFilms);
+const {value: filmsPart} = iterator.next();
 
+renderFilmCards(filmsListElement, filmsPart);
+
+if (mockFilms.length > FILMS_PER_STEP) {
   render(filmsListElement, createShowMoreBtnTemplate(), 'beforeend');
 
   const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
 
   showMoreButton.addEventListener('click', (evt) => {
     evt.preventDefault();
-    renderFilmCards(filmsListElement, renderedFilmsCount + FILMS_PER_STEP, mockFilms, renderedFilmsCount);
-    renderedFilmsCount += FILMS_PER_STEP;
+    const {value: filmsPart, done} = iterator.next();
+    renderFilmCards(filmsListElement, filmsPart);
 
-    if (renderedFilmsCount >= mockFilms.length) {
+    if (done) {
       showMoreButton.remove();
     }
   });
@@ -76,11 +106,11 @@ renderFilmCards(filmsListElement, Math.min(mockFilms.length, FILMS_PER_STEP), mo
 
 // секция Top rated
 render(filmsElement, createFilmsListExtraTemplate(TOP_RATED_TITLE, TOP_RATED_MODIFIER), 'beforeend');
-renderFilmCards(filmsElement.querySelector(`.films-list--extra.films-list--${TOP_RATED_MODIFIER}`), EXTRA_MOCK_FILMS_QUANTITY, extraMockFilms);
+renderFilmCards(filmsElement.querySelector(`.films-list--extra.films-list--${TOP_RATED_MODIFIER}`), mockTopRatedFilms);
 
 // секция Most commented
 render(filmsElement, createFilmsListExtraTemplate(MOST_COMMENTED_TITLE, MOST_COMMENTED_MODIFIER), 'beforeend');
-renderFilmCards(filmsElement.querySelector(`.films-list--extra.films-list--${MOST_COMMENTED_MODIFIER}`), EXTRA_MOCK_FILMS_QUANTITY, extraMockFilms);
+renderFilmCards(filmsElement.querySelector(`.films-list--extra.films-list--${MOST_COMMENTED_MODIFIER}`), mockMostCommentedFilms);
 
 // статистика в футере
 const footerStatisticsElement = document.querySelector('.footer__statistics');

@@ -104,6 +104,10 @@ const generateRandomDuration = () => {
   return `${getRandomInteger(1, MAX_QUANTITY_VALUE)}h ${getRandomInteger(0, MAX_MINUTE_VALUE)}m`;
 };
 
+const getCommentsIdArray = (comments) => {
+  return comments.map((item) => item.id);
+};
+
 
 export const generateFilm = () => {
   const description = generateDescription();
@@ -129,5 +133,6 @@ export const generateFilm = () => {
     fullDescription: description,
     ageLimit: getRandomInteger(0, MAX_AGE_VALUE),
     comments: commentsArray,
+    idComments: getCommentsIdArray(commentsArray),
   };
 };

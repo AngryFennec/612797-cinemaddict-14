@@ -45,3 +45,4 @@ export const formatNumber = (num) => {
   result = dividend + ' ' + result;
   return result;
 };
+

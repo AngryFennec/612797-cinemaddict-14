@@ -9,7 +9,7 @@ export const createFilmCardTemplate = (film) => {
     </p>
     <img src="images/posters/${film.posterUrl}" alt="" class="film-card__poster">
     <p class="film-card__description">${film.shortDescription}</p>
-    <a class="film-card__comments">${film.comments.length} comments</a>
+    <a class="film-card__comments">${film.idComments.length} comments</a>
     <div class="film-card__controls">
       <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
       <button class="film-card__controls-item button film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>

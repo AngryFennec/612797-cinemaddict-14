@@ -1,5 +1,7 @@
 import {generateRandomDate, getRandomArrayElement, getRandomInteger, getSubArray} from '../utils';
 
+const MIN_ID_VALUE = 100000;
+const MAX_ID_VALUE = 999999;
 const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 const AUTHORS = ['Churchill', 'Kennedy', 'Socrates', 'Martin Luther King Jr', 'Baldwin', 'Koni'];
 const TEXT_SENTENCES = [
@@ -24,6 +26,7 @@ const generateCommentText = () => {
 
 export const generateComment = () => {
   return {
+    id: getRandomInteger(MIN_ID_VALUE, MAX_ID_VALUE),
     text: generateCommentText(),
     emotion: getRandomArrayElement(EMOTIONS),
     author: getRandomArrayElement(AUTHORS),
