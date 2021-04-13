@@ -1,4 +1,4 @@
-import {getRandomInteger} from '../utils';
+import {getRandomInteger, createElement} from '../utils';
 
 const MAX_NAVIGATION_ITEM_VALUE = 20;
 
@@ -13,3 +13,25 @@ export const createNavigationTemplate = () => {
     <a href="#stats" class="main-navigation__additional main-navigation__additional--active">Stats</a>
   </nav>`;
 };
+
+export default class Navigation {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createNavigationTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,3 +1,5 @@
+import {createElement} from '../utils';
+
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
 };
@@ -30,8 +32,7 @@ const createCommentsTemplate = (comments, fullComments) => {
 };
 
 export const createPopupTemplate = (film) => {
-  return `
-    <section class="film-details">
+  return `<section class="film-details">
       <form class="film-details__inner" action="" method="get">
         <div class="film-details__top-container">
           <div class="film-details__close">
@@ -119,3 +120,26 @@ export const createPopupTemplate = (film) => {
       </form>
     </section>`;
 };
+
+export default class Popup {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
