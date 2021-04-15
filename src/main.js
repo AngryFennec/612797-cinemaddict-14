@@ -1,6 +1,6 @@
 import {generateFilm} from './mock/film';
-import {RenderPosition, render} from './utils.js';
-import ShowMore from './view/show-more';
+import {RenderPosition, render, getRandomInteger} from './utils.js';
+import ShowMoreBtn from './view/show-more-btn';
 import Profile from './view/profile';
 import FilmCard from './view/film-card';
 import Navigation from './view/navigation';
@@ -11,10 +11,12 @@ import FooterStatistics from './view/footer-statistics';
 import Popup from './view/popup';
 import Sort from './view/sort';
 
+
+const MAX_NAVIGATION_ITEM_VALUE = 20;
+
 const TOP_RATED_TITLE = 'Top rated';
 const MOST_COMMENTED_TITLE = 'Most commented';
-const TOP_RATED_MODIFIER = 'top-rated';
-const MOST_COMMENTED_MODIFIER = 'most-commented';
+
 const MOCK_FILMS_QUANTITY = 20;
 const EXTRA_MOCK_FILMS_QUANTITY = 2;
 const FILMS_PER_STEP = 5;
@@ -24,6 +26,7 @@ const ESCAPE = 'Escape';
 
 const renderFilmCard = (containerElement, film) => {
   const openPopup = () => {
+    newPopup = new Popup(film);
     document.body.appendChild(newPopup.getElement());
     const closeBtn = newPopup.getElement().querySelector('.film-details__close');
     closeBtn.addEventListener('click', closePopup);
@@ -44,7 +47,7 @@ const renderFilmCard = (containerElement, film) => {
   };
 
   const newFilmCard = new FilmCard(film);
-  const newPopup = new Popup(film);
+  let newPopup;
 
   render(containerElement, newFilmCard.getElement(), RenderPosition.BEFOREEND);
   const filmTitleElement = newFilmCard.getElement().querySelector('.film-card__title');
@@ -84,7 +87,7 @@ const getTopRatedFilms = (films) => {
 const getNextRenderCardIterator = (filmsData) => {
   const cardAmount = filmsData.length;
   let renderedCardCount = 0;
-  const renderItemAmount = 5;
+  const renderItemAmount = FILMS_PER_STEP;
   return {
     next() {
       const value = filmsData.slice(renderedCardCount, renderItemAmount + renderedCardCount);
@@ -107,7 +110,7 @@ const siteMainElement = document.querySelector('.main');
 render(siteHeaderElement, new Profile().getElement(), RenderPosition.BEFOREEND);
 
 // меню
-render(siteMainElement, new Navigation().getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, new Navigation(getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE), getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE), getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE)).getElement(), RenderPosition.BEFOREEND);
 
 //сортировка
 render(siteMainElement, new Sort().getElement(), RenderPosition.BEFOREEND);
@@ -126,7 +129,7 @@ const {value: filmsPart} = iterator.next();
 renderFilmCards(filmsListElement, filmsPart);
 
 if (mockFilms.length > FILMS_PER_STEP) {
-  render(filmsListElement, new ShowMore().getElement(), RenderPosition.BEFOREEND);
+  render(filmsListElement, new ShowMoreBtn().getElement(), RenderPosition.BEFOREEND);
 
   const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
 
@@ -141,15 +144,16 @@ if (mockFilms.length > FILMS_PER_STEP) {
   });
 }
 
-renderFilmCards(filmsListElement, Math.min(mockFilms.length, FILMS_PER_STEP), mockFilms);
+// дополнительные секции
+render(filmsElement, new FilmsListExtra(TOP_RATED_TITLE).getElement() , RenderPosition.BEFOREEND);
+render(filmsElement, new FilmsListExtra(MOST_COMMENTED_TITLE).getElement(), RenderPosition.BEFOREEND);
 
+const extraSectionsElements = Array.from(filmsElement.querySelectorAll('.films-list--extra'));
 // секция Top rated
-render(filmsElement, new FilmsListExtra(TOP_RATED_TITLE, TOP_RATED_MODIFIER).getElement() , RenderPosition.BEFOREEND);
-renderFilmCards(filmsElement.querySelector(`.films-list--extra.films-list--${TOP_RATED_MODIFIER}`), mockTopRatedFilms);
+renderFilmCards(extraSectionsElements[0], mockTopRatedFilms);
 
 // секция Most commented
-render(filmsElement, new FilmsListExtra(MOST_COMMENTED_TITLE, MOST_COMMENTED_MODIFIER).getElement(), RenderPosition.BEFOREEND);
-renderFilmCards(filmsElement.querySelector(`.films-list--extra.films-list--${MOST_COMMENTED_MODIFIER}`), mockMostCommentedFilms);
+renderFilmCards(extraSectionsElements[1], mockMostCommentedFilms);
 
 // статистика в футере
 const footerStatisticsElement = document.querySelector('.footer__statistics');
