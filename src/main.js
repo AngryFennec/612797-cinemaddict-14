@@ -10,7 +10,7 @@ import FilmsListExtra from './view/films-list-extra';
 import FooterStatistics from './view/footer-statistics';
 import Popup from './view/popup';
 import Sort from './view/sort';
-
+import FilmsEmptyList from './view/films-empty-list';
 
 const MAX_NAVIGATION_ITEM_VALUE = 20;
 
@@ -26,7 +26,7 @@ const ESCAPE = 'Escape';
 
 const renderFilmCard = (containerElement, film) => {
   const openPopup = () => {
-    newPopup = new Popup(film);
+    newPopup = newPopup || new Popup(film);
     document.body.appendChild(newPopup.getElement());
     const closeBtn = newPopup.getElement().querySelector('.film-details__close');
     closeBtn.addEventListener('click', closePopup);
@@ -120,41 +120,45 @@ render(siteMainElement, new Films().getElement(), RenderPosition.BEFOREEND);
 const filmsElement = siteMainElement.querySelector('.films');
 
 // основной список фильмов
-render(filmsElement, new FilmsList().getElement(), RenderPosition.BEFOREEND);
-const filmsListElement = filmsElement.querySelector('.films-list');
+if (mockFilms && mockFilms.length > 0) {
 
-const iterator = getNextRenderCardIterator(mockFilms);
-const {value: filmsPart} = iterator.next();
+  render(filmsElement, new FilmsList().getElement(), RenderPosition.BEFOREEND);
+  const filmsListElement = filmsElement.querySelector('.films-list');
 
-renderFilmCards(filmsListElement, filmsPart);
+  const iterator = getNextRenderCardIterator(mockFilms);
+  const {value: filmsPart} = iterator.next();
 
-if (mockFilms.length > FILMS_PER_STEP) {
-  render(filmsListElement, new ShowMoreBtn().getElement(), RenderPosition.BEFOREEND);
+  renderFilmCards(filmsListElement, filmsPart);
 
-  const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
+  if (mockFilms.length > FILMS_PER_STEP) {
+    render(filmsListElement, new ShowMoreBtn().getElement(), RenderPosition.BEFOREEND);
 
-  showMoreButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    const {value: filmsPart, done} = iterator.next();
-    renderFilmCards(filmsListElement, filmsPart);
+    const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
 
-    if (done) {
-      showMoreButton.remove();
-    }
-  });
+    showMoreButton.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      const {value: filmsPart, done} = iterator.next();
+      renderFilmCards(filmsListElement, filmsPart);
+
+      if (done) {
+        showMoreButton.remove();
+      }
+    });
+  }
+
+  // дополнительные секции
+  render(filmsElement, new FilmsListExtra(TOP_RATED_TITLE).getElement(), RenderPosition.BEFOREEND);
+  render(filmsElement, new FilmsListExtra(MOST_COMMENTED_TITLE).getElement(), RenderPosition.BEFOREEND);
+
+  const extraSectionsElements = Array.from(filmsElement.querySelectorAll('.films-list--extra'));
+  // секция Top rated
+  renderFilmCards(extraSectionsElements[0], mockTopRatedFilms);
+
+  // секция Most commented
+  renderFilmCards(extraSectionsElements[1], mockMostCommentedFilms);
+} else {
+  render(filmsElement, new FilmsEmptyList().getElement(), RenderPosition.BEFOREEND);
 }
-
-// дополнительные секции
-render(filmsElement, new FilmsListExtra(TOP_RATED_TITLE).getElement() , RenderPosition.BEFOREEND);
-render(filmsElement, new FilmsListExtra(MOST_COMMENTED_TITLE).getElement(), RenderPosition.BEFOREEND);
-
-const extraSectionsElements = Array.from(filmsElement.querySelectorAll('.films-list--extra'));
-// секция Top rated
-renderFilmCards(extraSectionsElements[0], mockTopRatedFilms);
-
-// секция Most commented
-renderFilmCards(extraSectionsElements[1], mockMostCommentedFilms);
-
 // статистика в футере
 const footerStatisticsElement = document.querySelector('.footer__statistics');
 render(footerStatisticsElement, new FooterStatistics().getElement(), RenderPosition.BEFOREEND);
