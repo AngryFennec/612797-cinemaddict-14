@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import Abstract from './abstract';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -121,25 +121,25 @@ export const createPopupTemplate = (film) => {
     </section>`;
 };
 
-export default class Popup {
+export default class Popup extends Abstract {
   constructor(film) {
+    super();
     this._film = film;
     this._element = null;
+    this._closeClickHandler = this._closeClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPopupTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _closeClickHandler() {
+    this._callback.closeClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    const closeBtn = this.getElement().querySelector('.film-details__close-btn');
+    closeBtn.addEventListener('click', this._closeClickHandler);
   }
 }

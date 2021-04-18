@@ -1,5 +1,4 @@
-import {createElement} from '../utils';
-
+import Abstract from './abstract';
 
 export const createNavigationTemplate = (watchListCount, historyCount, favoritesCount) => {
   return `<nav class="main-navigation">
@@ -13,8 +12,9 @@ export const createNavigationTemplate = (watchListCount, historyCount, favorites
   </nav>`;
 };
 
-export default class Navigation {
+export default class Navigation extends Abstract{
   constructor(watchListCount, historyCount, favoritesCount) {
+    super();
     this._element = null;
     this._watchListCount = watchListCount;
     this._historyCount = historyCount;
@@ -23,17 +23,5 @@ export default class Navigation {
 
   getTemplate() {
     return createNavigationTemplate(this._watchListCount, this._historyCount, this._favoritesCount);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

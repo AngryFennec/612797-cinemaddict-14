@@ -1,4 +1,4 @@
-import {generateRandomDate, getRandomArrayElement, getRandomInteger, getSubArray} from '../utils';
+import {generateRandomDate, getRandomArrayElement, getRandomInteger, getSubArray} from '../utils/common';
 
 const MIN_ID_VALUE = 100000;
 const MAX_ID_VALUE = 999999;

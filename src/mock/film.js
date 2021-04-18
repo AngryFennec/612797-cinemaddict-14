@@ -1,8 +1,8 @@
 import {
   getRandomArrayElement,
   getRandomInteger, generateRandomDate, getSubArray
-} from '../utils.js';
-import {generateComment} from './comment.js';
+} from '../utils/common';
+import {generateComment} from './comment';
 
 const MAX_DESCRIPTION = 140;
 const MAX_AGE_VALUE = 19;
