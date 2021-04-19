@@ -1,4 +1,4 @@
-import Abstract from './abstract';
+import AbstractView from './abstract-view';
 
 export const createNavigationTemplate = (watchListCount, historyCount, favoritesCount) => {
   return `<nav class="main-navigation">
@@ -12,7 +12,7 @@ export const createNavigationTemplate = (watchListCount, historyCount, favorites
   </nav>`;
 };
 
-export default class Navigation extends Abstract{
+export default class Navigation extends AbstractView{
   constructor(watchListCount, historyCount, favoritesCount) {
     super();
     this._element = null;

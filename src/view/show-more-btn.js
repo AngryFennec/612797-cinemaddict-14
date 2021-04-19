@@ -1,10 +1,10 @@
-import Abstract from './abstract';
+import AbstractView from './abstract-view';
 
 export const createShowMoreBtnTemplate = () => {
   return '<button class="films-list__show-more">Show more</button>';
 };
 
-export default class ShowMoreBtn extends Abstract {
+export default class ShowMoreBtn extends AbstractView {
   constructor() {
     super();
     this._clickHandler = this._clickHandler.bind(this); // для обработчика, использующего this, всегда биндим контекст - он теряется, потому что this показывает на DOM

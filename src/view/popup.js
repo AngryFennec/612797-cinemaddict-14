@@ -1,4 +1,4 @@
-import Abstract from './abstract';
+import AbstractView from './abstract-view';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -121,7 +121,7 @@ export const createPopupTemplate = (film) => {
     </section>`;
 };
 
-export default class Popup extends Abstract {
+export default class Popup extends AbstractView {
   constructor(film) {
     super();
     this._film = film;

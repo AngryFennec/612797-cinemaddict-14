@@ -54,10 +54,9 @@ const renderFilmCard = (containerElement, film) => {
 
 };
 
-const renderFilmCards = (section, mocks) => {
-  const containerElement = section.querySelector('.films-list__container');
+const renderFilmCards = (container, mocks) => {
   for (let i = 0; i < mocks.length; i++) {
-    renderFilmCard(containerElement, mocks[i]);
+    renderFilmCard(container, mocks[i]);
   }
 };
 
@@ -105,19 +104,21 @@ render(siteMainElement, new Navigation(getRandomInteger(1, MAX_NAVIGATION_ITEM_V
 render(siteMainElement, new Sort(), RenderPosition.BEFOREEND);
 
 // раздел с фильмами
-render(siteMainElement, new Films(), RenderPosition.BEFOREEND);
-const filmsElement = siteMainElement.querySelector('.films');
+const films = new Films();
+render(siteMainElement, films, RenderPosition.BEFOREEND);
+const filmsElement = films.getElement();
 
 // основной список фильмов
 if (mockFilms && mockFilms.length > 0) {
 
-  render(filmsElement, new FilmsList(), RenderPosition.BEFOREEND);
-  const filmsListElement = filmsElement.querySelector('.films-list');
+  const filmsList = new FilmsList();
+  render(filmsElement, filmsList, RenderPosition.BEFOREEND);
+  const filmsListElement = filmsList.getElement();
 
   const iterator = getNextRenderCardIterator(mockFilms);
   const {value: filmsPart} = iterator.next();
 
-  renderFilmCards(filmsListElement, filmsPart);
+  renderFilmCards(filmsList.getContainer(), filmsPart);
 
   if (mockFilms.length > FILMS_PER_STEP) {
     const showMoreButton = new ShowMoreBtn();
@@ -125,7 +126,7 @@ if (mockFilms && mockFilms.length > 0) {
 
     showMoreButton.setClickHandler(() => {
       const {value: filmsPart, done} = iterator.next();
-      renderFilmCards(filmsListElement, filmsPart);
+      renderFilmCards(filmsList.getContainer(), filmsPart);
 
       if (done) {
         showMoreButton.getElement().remove();
@@ -135,15 +136,17 @@ if (mockFilms && mockFilms.length > 0) {
   }
 
   // дополнительные секции
-  render(filmsElement, new FilmsListExtra(TOP_RATED_TITLE), RenderPosition.BEFOREEND);
-  render(filmsElement, new FilmsListExtra(MOST_COMMENTED_TITLE), RenderPosition.BEFOREEND);
+  const topRatedFilms = new FilmsListExtra(TOP_RATED_TITLE);
+  render(filmsElement, topRatedFilms, RenderPosition.BEFOREEND);
 
-  const extraSectionsElements = Array.from(filmsElement.querySelectorAll('.films-list--extra'));
+  const mostCommentedFilms = new FilmsListExtra(MOST_COMMENTED_TITLE);
+  render(filmsElement, mostCommentedFilms, RenderPosition.BEFOREEND);
+
   // секция Top rated
-  renderFilmCards(extraSectionsElements[0], mockTopRatedFilms);
+  renderFilmCards(topRatedFilms.getContainer(), mockTopRatedFilms);
 
   // секция Most commented
-  renderFilmCards(extraSectionsElements[1], mockMostCommentedFilms);
+  renderFilmCards(mostCommentedFilms.getContainer(), mockMostCommentedFilms);
 } else {
   render(filmsElement, new FilmsEmptyList(), RenderPosition.BEFOREEND);
 }

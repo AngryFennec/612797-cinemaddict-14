@@ -1,4 +1,4 @@
-import Abstract from './abstract';
+import AbstractView from './abstract-view';
 
 export const createFilmCardTemplate = (film) => {
   return `<article class="film-card">
@@ -20,7 +20,7 @@ export const createFilmCardTemplate = (film) => {
   </article>`;
 };
 
-export default class FilmCard extends Abstract {
+export default class FilmCard extends AbstractView {
   constructor(film) {
     super();
     this._film = film;

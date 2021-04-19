@@ -1,4 +1,4 @@
-import Abstract from './abstract';
+import AbstractView from './abstract-view';
 
 export const createProfileTemplate = () => {
   return `<section class="header__profile profile">
@@ -7,7 +7,7 @@ export const createProfileTemplate = () => {
   </section>`;
 };
 
-export default class Profile extends Abstract {
+export default class Profile extends AbstractView {
   getTemplate() {
     return createProfileTemplate();
   }
