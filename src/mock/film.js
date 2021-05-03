@@ -134,5 +134,10 @@ export const generateFilm = () => {
     ageLimit: getRandomInteger(0, MAX_AGE_VALUE),
     comments: commentsArray,
     idComments: getCommentsIdArray(commentsArray),
+    userDetails: {
+      watchlist: Math.random() >= 0.5,
+      alreadyWatched: Math.random() >= 0.5,
+      favorite: Math.random() >= 0.5,
+    },
   };
 };

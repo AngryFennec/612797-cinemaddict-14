@@ -1,13 +1,11 @@
 import FilmsList from '../view/films-list';
-import Popup from '../view/popup';
-import FilmCard from '../view/film-card';
 import {render, RenderPosition} from '../utils/render';
 import Films from '../view/films';
 import FilmsListExtra from '../view/films-list-extra';
 import FilmsEmptyList from '../view/films-empty-list';
 import ShowMoreBtn from '../view/show-more-btn';
+import FilmCardPresenter from './film-card-presenter';
 
-const ESCAPE = 'Escape';
 const TOP_RATED_TITLE = 'Top rated';
 const MOST_COMMENTED_TITLE = 'Most commented';
 
@@ -32,39 +30,10 @@ export default class FilmsPresenter {
     this._renderFilms();
   }
 
-
-  _renderFilmCard(containerElement, film) {
-    const openPopup = () => {
-      newPopup = newPopup || new Popup(film);
-      document.body.appendChild(newPopup.getElement());
-      newPopup.setCloseClickHandler(closePopup);
-      document.body.classList.add('hide-overflow');
-      document.addEventListener('keydown', onCloseEscPress);
-    };
-
-    const closePopup = () => {
-      document.body.removeChild(newPopup.getElement());
-      document.body.classList.remove('hide-overflow');
-      document.removeEventListener('keydown', onCloseEscPress);
-    };
-
-    const onCloseEscPress = (evt) => {
-      if (evt.key === ESCAPE) {
-        closePopup();
-      }
-    };
-
-    const newFilmCard = new FilmCard(film);
-    let newPopup;
-
-    render(containerElement, newFilmCard, RenderPosition.BEFOREEND);
-    newFilmCard.setClickHandler(openPopup);
-
-  }
-
-  _renderFilmCards(container, mocks) {
-    for (let i = 0; i < mocks.length; i++) {
-      this._renderFilmCard(container, mocks[i]);
+  _renderFilmCards(container, films) {
+    for (let i = 0; i < films.length; i++) {
+      const filmCardPresenter = new FilmCardPresenter(container, films[i]);
+      filmCardPresenter._renderFilmCard();
     }
   }
 

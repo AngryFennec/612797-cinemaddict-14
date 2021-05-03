@@ -127,6 +127,12 @@ export default class Popup extends AbstractView {
     this._film = film;
     this._element = null;
     this._closeClickHandler = this._closeClickHandler.bind(this);
+    this._addToWatchlistChangeHandler = this._addToWatchlistChangeHandler.bind(this);
+    this._addToAlreadyWatchedChangeHandler = this._addToAlreadyWatchedChangeHandler.bind(this);
+    this._addToFavoriteChangeHandler = this._addToFavoriteChangeHandler.bind(this);
+    this.getElement().querySelector('#watchlist').checked = this._film.userDetails.watchlist;
+    this.getElement().querySelector('#watched').checked = this._film.userDetails.alreadyWatched;
+    this.getElement().querySelector('#favorite').checked =  this._film.userDetails.favorite;
   }
 
   getTemplate() {
@@ -137,9 +143,42 @@ export default class Popup extends AbstractView {
     this._callback.closeClick();
   }
 
+  _addToWatchlistChangeHandler() {
+    this._callback.addToWatchlistChange();
+    this.getElement().querySelector('#watchlist').checked = this._film.userDetails.watchlist;
+  }
+
+  _addToAlreadyWatchedChangeHandler() {
+    this._callback.addToAlreadyWatchedChange();
+    this.getElement().querySelector('#watched').checked = this._film.userDetails.alreadyWatched;
+  }
+
+  _addToFavoriteChangeHandler() {
+    this._callback.addToAlreadyWatchedChange();
+    this.getElement().querySelector('#favorite').checked =  this._film.userDetails.favorite;
+  }
+
   setCloseClickHandler(callback) {
     this._callback.closeClick = callback;
     const closeBtn = this.getElement().querySelector('.film-details__close-btn');
     closeBtn.addEventListener('click', this._closeClickHandler);
+  }
+
+  setAddToWatchlistChangeHandler(callback) {
+    this._callback.addToWatchlistChange = callback;
+    const addToWatchlistInput = this.getElement().querySelector('#watchlist');
+    addToWatchlistInput.addEventListener('change', this._addToWatchlistChangeHandler);
+  }
+
+  setAddToAlreadyWatchedChangeHandler(callback) {
+    this._callback.addToAlreadyWatchedChange = callback;
+    const addToAlreadyWatchedInput = this.getElement().querySelector('#watched');
+    addToAlreadyWatchedInput.addEventListener('change', this._addToAlreadyWatchedChangeHandler);
+  }
+
+  setAddToFavoriteChangeHandler(callback) {
+    this._callback.addToFavoriteChange = callback;
+    const addToFavoriteInput = this.getElement().querySelector('#favorite');
+    addToFavoriteInput.addEventListener('change', this._addToFavoriteChangeHandler);
   }
 }
