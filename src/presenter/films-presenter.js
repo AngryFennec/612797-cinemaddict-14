@@ -5,6 +5,7 @@ import FilmsListExtra from '../view/films-list-extra';
 import FilmsEmptyList from '../view/films-empty-list';
 import ShowMoreBtn from '../view/show-more-btn';
 import FilmCardPresenter from './film-card-presenter';
+import {getNextRenderCardIterator} from '../utils/presenter';
 
 const TOP_RATED_TITLE = 'Top rated';
 const MOST_COMMENTED_TITLE = 'Most commented';
@@ -28,29 +29,25 @@ export default class FilmsPresenter {
     this._films = films.slice(); // копируем в презентер массив фильмов
     render(this._filmsContainer, this._filmsComponent, RenderPosition.BEFOREEND);
     this._renderFilms();
+
+    // дополнительные секции
+    render(this._filmsComponent.getElement(), this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
+
+    render(this._filmsComponent.getElement(), this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
+
+    // секция Top rated
+    this._renderFilmCards(this._topRatedFilmsListComponent.getContainer(), this._getTopRatedFilms());
+
+    // секция Most commented
+    this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), this._getMostCommentedFilms());
   }
 
   _renderFilmCards(container, films) {
     for (let i = 0; i < films.length; i++) {
       const filmCardPresenter = new FilmCardPresenter(container, films[i]);
-      filmCardPresenter._renderFilmCard();
+      filmCardPresenter.init();
     }
   }
-
-  _getNextRenderCardIterator(filmsData) {
-    const cardAmount = filmsData.length;
-    let renderedCardCount = 0;
-    const renderItemAmount = FILMS_PER_STEP;
-    return {
-      next() {
-        const value = filmsData.slice(renderedCardCount, renderItemAmount + renderedCardCount);
-        renderedCardCount += renderItemAmount;
-        const done = renderedCardCount >= cardAmount;
-        return {value, done};
-      },
-    };
-  }
-
 
   _renderShowMoreButton(iterator) {
     render(this._filmsComponent.getElement(), this._showMoreButtonComponent, RenderPosition.BEFOREEND);
@@ -87,23 +84,12 @@ export default class FilmsPresenter {
 
     render(filmsElement, this._filmsListComponent, RenderPosition.BEFOREEND);
 
-    const iterator = this._getNextRenderCardIterator(this._films);
+    const iterator = getNextRenderCardIterator(this._films, FILMS_PER_STEP);
     const {value: filmsPart} = iterator.next();
     this._renderFilmCards(this._filmsListComponent.getContainer(), filmsPart);
 
     if (this._films.length > FILMS_PER_STEP) {
       this._renderShowMoreButton(iterator);
     }
-
-    // дополнительные секции
-    render(filmsElement, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
-
-    render(filmsElement, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
-
-    // секция Top rated
-    this._renderFilmCards(this._topRatedFilmsListComponent.getContainer(), this._getTopRatedFilms());
-
-    // секция Most commented
-    this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), this._getMostCommentedFilms());
   }
 }

@@ -1,4 +1,5 @@
 import AbstractView from './abstract-view';
+import {UserDetails} from '../utils/presenter';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -127,9 +128,6 @@ export default class Popup extends AbstractView {
     this._film = film;
     this._element = null;
     this._closeClickHandler = this._closeClickHandler.bind(this);
-    this._addToWatchlistChangeHandler = this._addToWatchlistChangeHandler.bind(this);
-    this._addToAlreadyWatchedChangeHandler = this._addToAlreadyWatchedChangeHandler.bind(this);
-    this._addToFavoriteChangeHandler = this._addToFavoriteChangeHandler.bind(this);
     this.getElement().querySelector('#watchlist').checked = this._film.userDetails.watchlist;
     this.getElement().querySelector('#watched').checked = this._film.userDetails.alreadyWatched;
     this.getElement().querySelector('#favorite').checked =  this._film.userDetails.favorite;
@@ -143,42 +141,28 @@ export default class Popup extends AbstractView {
     this._callback.closeClick();
   }
 
-  _addToWatchlistChangeHandler() {
-    this._callback.addToWatchlistChange();
-    this.getElement().querySelector('#watchlist').checked = this._film.userDetails.watchlist;
-  }
-
-  _addToAlreadyWatchedChangeHandler() {
-    this._callback.addToAlreadyWatchedChange();
-    this.getElement().querySelector('#watched').checked = this._film.userDetails.alreadyWatched;
-  }
-
-  _addToFavoriteChangeHandler() {
-    this._callback.addToAlreadyWatchedChange();
-    this.getElement().querySelector('#favorite').checked =  this._film.userDetails.favorite;
-  }
-
   setCloseClickHandler(callback) {
     this._callback.closeClick = callback;
     const closeBtn = this.getElement().querySelector('.film-details__close-btn');
     closeBtn.addEventListener('click', this._closeClickHandler);
   }
 
-  setAddToWatchlistChangeHandler(callback) {
-    this._callback.addToWatchlistChange = callback;
+  _setChangeInputHandler(property) {
+    return () => { // стрелочная функция для this
+      this._callback.changeDetails(property);
+      this.getElement().querySelector(`#${property}`).checked = this._film.userDetails[UserDetails[property]];
+    };
+  }
+
+  setChangeDetailsCallback(callback) {
+    this._callback.changeDetails = callback;
     const addToWatchlistInput = this.getElement().querySelector('#watchlist');
-    addToWatchlistInput.addEventListener('change', this._addToWatchlistChangeHandler);
-  }
+    addToWatchlistInput.addEventListener('change', this._setChangeInputHandler('watchlist'));
 
-  setAddToAlreadyWatchedChangeHandler(callback) {
-    this._callback.addToAlreadyWatchedChange = callback;
     const addToAlreadyWatchedInput = this.getElement().querySelector('#watched');
-    addToAlreadyWatchedInput.addEventListener('change', this._addToAlreadyWatchedChangeHandler);
-  }
+    addToAlreadyWatchedInput.addEventListener('change', this._setChangeInputHandler('watched'));
 
-  setAddToFavoriteChangeHandler(callback) {
-    this._callback.addToFavoriteChange = callback;
     const addToFavoriteInput = this.getElement().querySelector('#favorite');
-    addToFavoriteInput.addEventListener('change', this._addToFavoriteChangeHandler);
+    addToFavoriteInput.addEventListener('change', this._setChangeInputHandler('favorite'));
   }
 }

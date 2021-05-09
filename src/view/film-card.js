@@ -1,6 +1,13 @@
 import AbstractView from './abstract-view';
+import {UserDetails} from '../utils/presenter';
 
 const BTN_ACTIVE_CLASS = 'film-card__controls-item--active';
+
+const Modificators = {
+  'watchlist': 'add-to-watchlist',
+  'watched': 'mark-as-watched',
+  'favorite': 'favorite',
+};
 
 export const createFilmCardTemplate = (film) => {
   return `<article class="film-card">
@@ -28,9 +35,7 @@ export default class FilmCard extends AbstractView {
     this._film = film;
     this._element = null;
     this._clickHandler = this._clickHandler.bind(this);
-    this._addToWatchlistClickHandler = this._addToWatchlistClickHandler.bind(this);
-    this._addToAlreadyWatchedClickHandler = this._addToAlreadyWatchedClickHandler.bind(this);
-    this._addToFavoriteClickHandler = this._addToFavoriteClickHandler.bind(this);
+    this._setClickBtnHandler = this._setClickBtnHandler.bind(this);
     this.renewButtons();
   }
 
@@ -39,51 +44,15 @@ export default class FilmCard extends AbstractView {
     this._callback.click();
   }
 
-  changeAddToWatchlistBtnState() {
-    const addToWatchlistBtn = this.getElement().querySelector('.film-card__controls-item--add-to-watchlist');
-    if (this._film.userDetails.watchlist && !addToWatchlistBtn.classList.contains(BTN_ACTIVE_CLASS)) {
-      addToWatchlistBtn.classList.add(BTN_ACTIVE_CLASS);
+  changeBtnState(property) {
+    const btn = this.getElement().querySelector(`.film-card__controls-item--${Modificators[property]}`);
+    if (this._film.userDetails[UserDetails[property]] && !btn.classList.contains(BTN_ACTIVE_CLASS)) {
+      btn.classList.add(BTN_ACTIVE_CLASS);
       return;
     }
-    if (!this._film.userDetails.watchlist) {
-      addToWatchlistBtn.classList.remove(BTN_ACTIVE_CLASS);
+    if (!this._film.userDetails[UserDetails[property]]) {
+      btn.classList.remove(BTN_ACTIVE_CLASS);
     }
-  }
-
-  changeAddToAlreadyWatchedBtnState() {
-    const addToAlreadyWatchedBtn = this.getElement().querySelector('.film-card__controls-item--mark-as-watched');
-    if (this._film.userDetails.alreadyWatched && !addToAlreadyWatchedBtn.classList.contains(BTN_ACTIVE_CLASS)) {
-      addToAlreadyWatchedBtn.classList.add(BTN_ACTIVE_CLASS);
-      return;
-    }
-    if (!this._film.userDetails.alreadyWatched) {
-      addToAlreadyWatchedBtn.classList.remove(BTN_ACTIVE_CLASS);
-    }
-  }
-
-  changeAddToFavoriteBtnState() {
-    const addToFavoriteBtn = this.getElement().querySelector('.film-card__controls-item--favorite');
-    if (this._film.userDetails.favorite && !addToFavoriteBtn.classList.contains(BTN_ACTIVE_CLASS)) {
-      addToFavoriteBtn.classList.add(BTN_ACTIVE_CLASS);
-      return;
-    }
-    if (!this._film.userDetails.favorite) {
-      addToFavoriteBtn.classList.remove(BTN_ACTIVE_CLASS);
-    }  }
-
-  _addToWatchlistClickHandler() {
-    this._callback.addToWatchlistClick();
-    this.changeAddToWatchlistBtnState();
-  }
-
-  _addToAlreadyWatchedClickHandler() {
-    this._callback.addToAlreadyWatchedClick();
-    this.changeAddToAlreadyWatchedBtnState();
-  }
-
-  _addToFavoriteClickHandler() {
-    this._callback.addToFavoriteClick();
-    this.changeAddToFavoriteBtnState();
   }
 
   getTemplate() {
@@ -102,27 +71,28 @@ export default class FilmCard extends AbstractView {
     filmCommentsElement.addEventListener('click', this._clickHandler);
   }
 
-  setAddToWatchlistClickHandler(callback) {
-    this._callback.addToWatchlistClick = callback;
-    const addToWatchlistBtn = this.getElement().querySelector('.film-card__controls-item--add-to-watchlist');
-    addToWatchlistBtn.addEventListener('click', this._addToWatchlistClickHandler);
+  _setClickBtnHandler(property) {
+    return () => { // стрелочная функция для this
+      this._callback.changeDetails(property);
+      this.changeBtnState(property);
+    };
   }
 
-  setAddToAlreadyWatchedClickHandler(callback) {
-    this._callback.addToAlreadyWatchedClick = callback;
-    const addToAlreadyWatchedBtn = this.getElement().querySelector('.film-card__controls-item--mark-as-watched');
-    addToAlreadyWatchedBtn.addEventListener('click', this._addToAlreadyWatchedClickHandler);
-  }
+  setChangeDetailsCallback(callback) {
+    this._callback.changeDetails = callback;
+    const addToWatchlistBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['watchlist']}`);
+    addToWatchlistBtn.addEventListener('click', this._setClickBtnHandler('watchlist'));
 
-  setAddToFavoriteClickHandler(callback) {
-    this._callback.addToFavoriteClick = callback;
-    const addToFavoriteBtn = this.getElement().querySelector('.film-card__controls-item--favorite');
-    addToFavoriteBtn.addEventListener('click', this._addToFavoriteClickHandler);
+    const addToAlreadyWatchedBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['watched']}`);
+    addToAlreadyWatchedBtn.addEventListener('click', this._setClickBtnHandler('watched'));
+
+    const addToFavoriteBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['favorite']}`);
+    addToFavoriteBtn.addEventListener('click', this._setClickBtnHandler('favorite'));
   }
 
   renewButtons() {
-    this.changeAddToWatchlistBtnState();
-    this.changeAddToAlreadyWatchedBtnState();
-    this.changeAddToFavoriteBtnState();
+    this.changeBtnState('watchlist');
+    this.changeBtnState('watched');
+    this.changeBtnState('favorite');
   }
 }
