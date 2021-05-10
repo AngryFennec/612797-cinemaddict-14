@@ -25,6 +25,7 @@ export default class ShowMoreBtn extends AbstractView {
   }
 
   removeElement() {
+    this.getElement().remove();
     super.removeElement();
   }
 }

@@ -5,7 +5,7 @@ import {render, RenderPosition, replace} from '../utils/render';
 const ESCAPE = 'Escape';
 
 export default class FilmCardPresenter {
-  constructor(container, film) {
+  constructor(film, container) {
     this._container = container;
     this._film = film;
     this._isPopupOpen = false;
@@ -23,7 +23,6 @@ export default class FilmCardPresenter {
       return;
     }
     replace(newFilmCardInstance, this._filmCard);
-    this._filmCard.getElement().remove();
     this._filmCard = newFilmCardInstance;
     this._setFilmCardHandlers();
 
@@ -31,7 +30,6 @@ export default class FilmCardPresenter {
     if (this._isPopupOpen) {
       replace(newPopupInstance, this._popup);
     }
-    this._popup.getElement().remove();
     this._popup = newPopupInstance;
   }
 

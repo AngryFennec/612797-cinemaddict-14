@@ -44,7 +44,7 @@ export default class FilmsPresenter {
 
   _renderFilmCards(container, films) {
     for (let i = 0; i < films.length; i++) {
-      const filmCardPresenter = new FilmCardPresenter(container, films[i]);
+      const filmCardPresenter = new FilmCardPresenter(films[i], container);
       filmCardPresenter.init();
     }
   }
@@ -57,7 +57,6 @@ export default class FilmsPresenter {
       this._renderFilmCards(this._filmsListComponent.getContainer(), filmsPart);
 
       if (done) {
-        this._showMoreButtonComponent.getElement().remove();
         this._showMoreButtonComponent.removeElement();
       }
     });
