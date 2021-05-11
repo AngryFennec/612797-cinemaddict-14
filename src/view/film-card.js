@@ -1,4 +1,13 @@
 import AbstractView from './abstract-view';
+import {UserDetails} from '../utils/presenter';
+
+const BTN_ACTIVE_CLASS = 'film-card__controls-item--active';
+
+const Modificators = {
+  'watchlist': 'add-to-watchlist',
+  'watched': 'mark-as-watched',
+  'favorite': 'favorite',
+};
 
 export const createFilmCardTemplate = (film) => {
   return `<article class="film-card">
@@ -26,11 +35,24 @@ export default class FilmCard extends AbstractView {
     this._film = film;
     this._element = null;
     this._clickHandler = this._clickHandler.bind(this);
+    this._setClickBtnHandler = this._setClickBtnHandler.bind(this);
+    this.renewButtons();
   }
 
   _clickHandler(evt) {
     evt.preventDefault();
     this._callback.click();
+  }
+
+  changeBtnState(property) {
+    const btn = this.getElement().querySelector(`.film-card__controls-item--${Modificators[property]}`);
+    if (this._film.userDetails[UserDetails[property]] && !btn.classList.contains(BTN_ACTIVE_CLASS)) {
+      btn.classList.add(BTN_ACTIVE_CLASS);
+      return;
+    }
+    if (!this._film.userDetails[UserDetails[property]]) {
+      btn.classList.remove(BTN_ACTIVE_CLASS);
+    }
   }
 
   getTemplate() {
@@ -47,5 +69,30 @@ export default class FilmCard extends AbstractView {
 
     const filmCommentsElement = this.getElement().querySelector('.film-card__comments');
     filmCommentsElement.addEventListener('click', this._clickHandler);
+  }
+
+  _setClickBtnHandler(property) {
+    return () => { // стрелочная функция для this
+      this._callback.changeDetails(property);
+      this.changeBtnState(property);
+    };
+  }
+
+  setChangeDetailsCallback(callback) {
+    this._callback.changeDetails = callback;
+    const addToWatchlistBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['watchlist']}`);
+    addToWatchlistBtn.addEventListener('click', this._setClickBtnHandler('watchlist'));
+
+    const addToAlreadyWatchedBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['watched']}`);
+    addToAlreadyWatchedBtn.addEventListener('click', this._setClickBtnHandler('watched'));
+
+    const addToFavoriteBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['favorite']}`);
+    addToFavoriteBtn.addEventListener('click', this._setClickBtnHandler('favorite'));
+  }
+
+  renewButtons() {
+    this.changeBtnState('watchlist');
+    this.changeBtnState('watched');
+    this.changeBtnState('favorite');
   }
 }
