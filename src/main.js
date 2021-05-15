@@ -4,7 +4,6 @@ import {render, RenderPosition} from './utils/render';
 import Profile from './view/profile';
 import Navigation from './view/navigation';
 import Footer from './view/footer';
-import Sort from './view/sort';
 import FilmsPresenter from './presenter/films-presenter';
 
 const MAX_NAVIGATION_ITEM_VALUE = 20;
@@ -13,7 +12,10 @@ const MAX_FILMS_QUANTITY = 100000;
 
 
 // создание моковых массивов
-const mockFilms = new Array(MOCK_FILMS_QUANTITY).fill().map(generateFilm);
+const mockFilms = [];
+for (let i = 0; i < MOCK_FILMS_QUANTITY; i++) {
+  mockFilms.push(generateFilm(i));
+}
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -23,9 +25,6 @@ render(siteHeaderElement, new Profile(), RenderPosition.BEFOREEND);
 
 // меню
 render(siteMainElement, new Navigation(getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE), getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE), getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE)), RenderPosition.BEFOREEND);
-
-//сортировка
-render(siteMainElement, new Sort(), RenderPosition.BEFOREEND);
 
 // раздел с фильмами
 const filmsPresenter = new FilmsPresenter(siteMainElement);

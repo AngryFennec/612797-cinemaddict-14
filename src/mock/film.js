@@ -92,7 +92,7 @@ const generateRating = () => {
 };
 
 const getFormattedDate = (date) => {
-  const month = date.toLocaleString();
+  const month = date.toLocaleString('en-us', { month: 'long' });
   return `${date.getDate()} ${month} ${date.getFullYear()}`;
 };
 
@@ -109,11 +109,12 @@ const getCommentsIdArray = (comments) => {
 };
 
 
-export const generateFilm = () => {
+export const generateFilm = (id) => {
   const description = generateDescription();
   const commentsArray = generateCommentsArray();
   const randomDate = generateRandomDate();
   return {
+    id: parseInt(id),
     posterUrl: getRandomArrayElement(MOCK_POSTERS),
     title: getRandomArrayElement(MOCK_TITLES),
     rating: generateRating(),
@@ -128,6 +129,7 @@ export const generateFilm = () => {
     screenWriters: getSubArray(getRandomInteger((1, MAX_QUANTITY_VALUE)), MOCK_PERSONS),
     actors: getSubArray(getRandomInteger((1, MAX_QUANTITY_VALUE)), MOCK_PERSONS),
     date: getFormattedDate(randomDate),
+    rawDate: randomDate,
     country: getRandomArrayElement(MOCK_COUNTRIES),
     genres: getSubArray(getRandomInteger((1, MAX_QUANTITY_VALUE)), MOCK_GENRES),
     fullDescription: description,
