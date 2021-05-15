@@ -33,14 +33,12 @@ export default class Sort extends AbstractView {
 
   _clickHandler(evt) {
     evt.preventDefault();
-    if (evt.target.tagName === 'UL') {
+    const clickedSortButton = evt.target.closest('.sort__button:not(.sort__button--active');
+    if (!clickedSortButton) {
       return;
     }
-    const clickTarget = evt.target.tagName === 'LI' ? evt.target.firstElementChild : evt.target;
-    if (!clickTarget.classList.contains(SORT_ACTIVE_CLASS)) {
-      this._removeActiveClass();
-      clickTarget.classList.add(SORT_ACTIVE_CLASS);
-      this._callback.click(clickTarget.dataset.sort);
-    }
+    this._removeActiveClass();
+    clickedSortButton.classList.add(SORT_ACTIVE_CLASS);
+    this._callback.click(clickedSortButton.dataset.sort);
   }
 }

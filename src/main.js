@@ -10,12 +10,8 @@ const MAX_NAVIGATION_ITEM_VALUE = 20;
 const MOCK_FILMS_QUANTITY = 20;
 const MAX_FILMS_QUANTITY = 100000;
 
-
 // создание моковых массивов
-const mockFilms = [];
-for (let i = 0; i < MOCK_FILMS_QUANTITY; i++) {
-  mockFilms.push(generateFilm(i));
-}
+const mockFilms = new Array(MOCK_FILMS_QUANTITY).fill().map((_, i) => generateFilm(i));
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
