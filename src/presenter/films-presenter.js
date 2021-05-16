@@ -11,7 +11,7 @@ import {
   getTopRatedFilms,
   sortByDate,
   sortById,
-  sortByRating,
+  sortByRating
 } from '../utils/presenter';
 import Sort from '../view/sort';
 
@@ -86,9 +86,11 @@ export default class FilmsPresenter {
       return;
     }
     const newFilmsListInstance = new FilmsList();
-    this._filmsListComponent ?
-      replace(newFilmsListInstance, this._filmsListComponent) :
+    if (this._filmsListComponent) {
+      replace(newFilmsListInstance, this._filmsListComponent);
+    } else {
       render(filmsElement, newFilmsListInstance, RenderPosition.AFTERBEGIN);
+    }
 
     this._filmsListComponent = newFilmsListInstance;
 
