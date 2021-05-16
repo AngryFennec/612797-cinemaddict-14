@@ -1,5 +1,5 @@
-import AbstractView from './abstract-view';
 import {UserDetails} from '../utils/presenter';
+import SmartView from './smart-view';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -103,9 +103,9 @@ export const createPopupTemplate = (film) => {
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${film.idComments.length}</span></h3>
             ${createCommentsTemplate(film.idComments, film.comments)}
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label"></div>
+              <div class="film-details__add-emoji-label">${film.emoji ? `<img src="images/emoji/${film.emoji}.png" width="55" height="55" alt="emoji-${film.emoji}">` : ''}</div>
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.comment ? film.comment : ''}</textarea>
               </label>
               <div class="film-details__emoji-list">
               ${['smile', 'sleeping', 'puke', 'angry'].map((item) => {
@@ -122,19 +122,22 @@ export const createPopupTemplate = (film) => {
     </section>`;
 };
 
-export default class Popup extends AbstractView {
+export default class Popup extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    this._data = Popup.parseFilmToData(film);
     this._element = null;
     this._closeClickHandler = this._closeClickHandler.bind(this);
-    this.getElement().querySelector('#watchlist').checked = this._film.userDetails.watchlist;
-    this.getElement().querySelector('#watched').checked = this._film.userDetails.alreadyWatched;
-    this.getElement().querySelector('#favorite').checked =  this._film.userDetails.favorite;
+    this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+    this.getElement().querySelector('#watchlist').checked = this._data.userDetails.watchlist;
+    this.getElement().querySelector('#watched').checked = this._data.userDetails.alreadyWatched;
+    this.getElement().querySelector('#favorite').checked = this._data.userDetails.favorite;
+    this._setCommentsBlockHandlers();
   }
 
   getTemplate() {
-    return createPopupTemplate(this._film);
+    return createPopupTemplate(this._data);
   }
 
   _closeClickHandler() {
@@ -150,7 +153,7 @@ export default class Popup extends AbstractView {
   _setChangeInputHandler(property) {
     return () => { // стрелочная функция для this
       this._callback.changeDetails(property);
-      this.getElement().querySelector(`#${property}`).checked = this._film.userDetails[UserDetails[property]];
+      this.getElement().querySelector(`#${property}`).checked = this._data.userDetails[UserDetails[property]];
     };
   }
 
@@ -164,5 +167,79 @@ export default class Popup extends AbstractView {
 
     const addToFavoriteInput = this.getElement().querySelector('#favorite');
     addToFavoriteInput.addEventListener('change', this._setChangeInputHandler('favorite'));
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign(
+      {},
+      film,
+      {
+        emoji: null,
+        comment: '',
+      },
+    );
+  }
+
+  static parseDataToFilm(data) {
+    data = Object.assign({}, data);
+    delete data.comment;
+    delete data.emoji;
+    return data;
+  }
+
+  reset(film) {
+    this.updateData(
+      Popup.parseFilmToData(film),
+    );
+  }
+
+  _emojiChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      emoji: evt.target.value,
+    });
+  }
+
+  _commentInputHandler(evt) {
+    this.updateData({
+      comment: evt.target.value,
+    }, true);
+  }
+
+  _commentSubmitHandler(evt) {
+    if (!(evt.ctrlKey || evt.metaKey) || evt.key !== 'Enter') {
+      return;
+    }
+    if (!this._data || !this._data.emoji || !this._data.comment.trim()) {
+      return;
+    }
+    this._data = Popup.parseDataToFilm(this._data);
+    this.updateElement();
+  }
+
+  _setEmojiChangeHandler() {
+    const emojiElements = Array.from(this.getElement().querySelectorAll('.film-details__emoji-item'));
+    emojiElements.forEach((item) => item.addEventListener('change', this._emojiChangeHandler));
+  }
+
+  _setCommentInputHandler() {
+    const commentElements = Array.from(this.getElement().querySelectorAll('.film-details__comment-input'));
+    commentElements.forEach((item) => item.addEventListener('input', this._commentInputHandler));
+  }
+
+  _setCommentSubmitHandler() {
+    document.addEventListener('keydown', this._commentSubmitHandler);
+  }
+
+  _setCommentsBlockHandlers() {
+    this._setEmojiChangeHandler();
+    this._setCommentInputHandler();
+    this._setCommentSubmitHandler();
+  }
+
+  restoreHandlers() {
+    this._setCommentsBlockHandlers();
+    this.setChangeDetailsCallback(this._callback.changeDetails);
+    this.setCloseClickHandler(this._callback.closeClick);
   }
 }
