@@ -27,10 +27,15 @@ export default class FilmCardPresenter {
     this._setFilmCardHandlers();
 
     const newPopupInstance = new Popup(this._film);
-    if (this._isPopupOpen) {
+    // здесь пришлось сделать If-else, потому что в прежнем порядке обработчики устанавливались не на тот инстанс
+    if (!this._isPopupOpen) {
+      this._popup = newPopupInstance;
+    } else {
       replace(newPopupInstance, this._popup);
+      this._popup = newPopupInstance;
+      this._setPopupHandlers();
     }
-    this._popup = newPopupInstance;
+
   }
 
   _openPopup() {

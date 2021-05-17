@@ -1,5 +1,6 @@
 import {UserDetails} from '../utils/presenter';
 import SmartView from './smart-view';
+import { nanoid } from 'nanoid';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -90,11 +91,11 @@ export const createPopupTemplate = (film) => {
             </div>
           </div>
           <section class="film-details__controls">
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${film.userDetails.watchlist ? 'checked' : ''}>
             <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${film.userDetails.alreadyWatched ? 'checked' : ''}>
             <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${film.userDetails.favorite ? 'checked' : ''}>
             <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
           </section>
         </div>
@@ -130,9 +131,8 @@ export default class Popup extends SmartView {
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
-    this.getElement().querySelector('#watchlist').checked = this._data.userDetails.watchlist;
-    this.getElement().querySelector('#watched').checked = this._data.userDetails.alreadyWatched;
-    this.getElement().querySelector('#favorite').checked = this._data.userDetails.favorite;
+    this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
+    this._setChangeInputHandler = this._setChangeInputHandler.bind(this);
     this._setCommentsBlockHandlers();
   }
 
@@ -159,6 +159,7 @@ export default class Popup extends SmartView {
 
   setChangeDetailsCallback(callback) {
     this._callback.changeDetails = callback;
+
     const addToWatchlistInput = this.getElement().querySelector('#watchlist');
     addToWatchlistInput.addEventListener('change', this._setChangeInputHandler('watchlist'));
 
@@ -197,6 +198,7 @@ export default class Popup extends SmartView {
     evt.preventDefault();
     this.updateData({
       emoji: evt.target.value,
+      scrollPosition: this.getElement().scrollTop,
     });
   }
 
@@ -213,7 +215,22 @@ export default class Popup extends SmartView {
     if (!this._data || !this._data.emoji || !this._data.comment.trim()) {
       return;
     }
-    this._data = Popup.parseDataToFilm(this._data);
+
+    const commentId = nanoid();
+
+    this._data.comments.push({
+      id: commentId,
+      text: this._data.comment,
+      emotion: this._data.emoji,
+      author: 'Author',
+      date: '',
+    });
+
+    this._data.idComments.push(commentId);
+
+    this._data.commentsQuantity = this._data.comments.length;
+
+    this._data = Popup.parseFilmToData(this._data);
     this.updateElement();
   }
 
@@ -228,7 +245,7 @@ export default class Popup extends SmartView {
   }
 
   _setCommentSubmitHandler() {
-    document.addEventListener('keydown', this._commentSubmitHandler);
+    this.getElement().addEventListener('keydown', this._commentSubmitHandler);
   }
 
   _setCommentsBlockHandlers() {
@@ -237,9 +254,16 @@ export default class Popup extends SmartView {
     this._setCommentSubmitHandler();
   }
 
+  _setScrollPosition() {
+    if(this._data.scrollPosition !== 0) {
+      this.getElement().scrollTop = this._data.scrollPosition;
+    }
+  }
+
   restoreHandlers() {
     this._setCommentsBlockHandlers();
     this.setChangeDetailsCallback(this._callback.changeDetails);
     this.setCloseClickHandler(this._callback.closeClick);
+    this._setScrollPosition();
   }
 }
