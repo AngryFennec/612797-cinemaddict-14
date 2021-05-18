@@ -1,5 +1,4 @@
 import SmartView from './smart-view';
-import {nanoid} from 'nanoid';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -132,7 +131,9 @@ export default class Popup extends SmartView {
     this._commentInputHandler = this._commentInputHandler.bind(this);
     this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
     this._setChangeInputHandler = this._setChangeInputHandler.bind(this);
-    this._setCommentsBlockHandlers();
+    this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
   }
 
   getTemplate() {
@@ -151,6 +152,7 @@ export default class Popup extends SmartView {
 
   _setChangeInputHandler(property) {
     return () => { // стрелочная функция для this
+      this._data = Popup.parseFilmToData();
       this._callback.changeDetails(property);
     };
   }
@@ -172,18 +174,7 @@ export default class Popup extends SmartView {
     return Object.assign(
       {},
       film,
-      {
-        emoji: null,
-        comment: '',
-      },
     );
-  }
-
-  static parseDataToFilm(data) {
-    data = Object.assign({}, data);
-    delete data.comment;
-    delete data.emoji;
-    return data;
   }
 
   reset(film) {
@@ -193,72 +184,58 @@ export default class Popup extends SmartView {
   }
 
   _emojiChangeHandler(evt) {
-    evt.preventDefault();
-    this.updateData({
-      emoji: evt.target.value,
-    });
+    this._callback.changeEmoji(evt);
   }
 
   _commentInputHandler(evt) {
-    this.updateData({
-      comment: evt.target.value,
-    }, true);
+    this._callback.inputComment(evt);
   }
 
   _commentSubmitHandler(evt) {
-    if (!(evt.ctrlKey || evt.metaKey) || evt.key !== 'Enter') {
-      return;
-    }
-    if (!this._data || !this._data.emoji || !this._data.comment.trim()) {
-      return;
-    }
-
-    const commentId = nanoid();
-
-    this._data.comments.push({
-      id: commentId,
-      text: this._data.comment,
-      emotion: this._data.emoji,
-      author: 'Author',
-      date: '',
-    });
-
-    this._data.idComments.push(commentId);
-
-    this._data.commentsQuantity = this._data.comments.length;
-
-    this._data = Popup.parseFilmToData(this._data);
-    this.updateElement();
+    this._callback.submitComment(evt);
   }
 
-  _setEmojiChangeHandler() {
+  setEmojiChangeHandler(callback) {
+    this._callback.changeEmoji = callback;
     const emojiElements = Array.from(this.getElement().querySelectorAll('.film-details__emoji-item'));
     emojiElements.forEach((item) => item.addEventListener('change', this._emojiChangeHandler));
   }
 
-  _setCommentInputHandler() {
-    const commentElements = Array.from(this.getElement().querySelectorAll('.film-details__comment-input'));
-    commentElements.forEach((item) => item.addEventListener('input', this._commentInputHandler));
+  setCommentInputHandler(callback) {
+    this._callback.inputComment = callback;
+    const commentElement = this.getElement().querySelector('.film-details__comment-input');
+    commentElement.addEventListener('input', this._commentInputHandler);
   }
 
-  _setCommentSubmitHandler() {
+
+  setCommentSubmitHandler(callback) {
+    this._callback.submitComment = callback;
     this.getElement().addEventListener('keydown', this._commentSubmitHandler);
+    this.getElement().querySelector('.film-details__comment-input').focus();
   }
 
-  _setCommentsBlockHandlers() {
-    this._setEmojiChangeHandler();
-    this._setCommentInputHandler();
-    this._setCommentSubmitHandler();
-  }
 
-  _setScrollPosition(position) {
+  setScrollPosition(position) {
     this.getElement().scrollTop = position;
   }
 
+  setScrollChangeHandler(callback) {
+    this._callback.changeScroll = callback;
+    this.getElement().addEventListener('scroll', this._callback.changeScroll);
+  }
+
   restoreHandlers() {
-    this._setCommentsBlockHandlers();
     this.setChangeDetailsCallback(this._callback.changeDetails);
     this.setCloseClickHandler(this._callback.closeClick);
-    // this._setScrollPosition();
+    this.setScrollChangeHandler(this._callback.changeScroll);
+    this.setEmojiChangeHandler(this._callback.changeEmoji);
+    this.setCommentInputHandler(this._callback.inputComment);
+    this.setCommentSubmitHandler(this._callback.submitComment);
+  }
+
+  updateElement() {
+    const { scrollTop } = this.getElement();
+    super.updateElement();
+    this.getElement().scrollTop = scrollTop;
   }
 }
