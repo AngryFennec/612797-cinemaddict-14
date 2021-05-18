@@ -1,6 +1,5 @@
-import {UserDetails} from '../utils/presenter';
 import SmartView from './smart-view';
-import { nanoid } from 'nanoid';
+import {nanoid} from 'nanoid';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -153,7 +152,6 @@ export default class Popup extends SmartView {
   _setChangeInputHandler(property) {
     return () => { // стрелочная функция для this
       this._callback.changeDetails(property);
-      this.getElement().querySelector(`#${property}`).checked = this._data.userDetails[UserDetails[property]];
     };
   }
 
@@ -198,7 +196,6 @@ export default class Popup extends SmartView {
     evt.preventDefault();
     this.updateData({
       emoji: evt.target.value,
-      scrollPosition: this.getElement().scrollTop,
     });
   }
 
@@ -254,16 +251,14 @@ export default class Popup extends SmartView {
     this._setCommentSubmitHandler();
   }
 
-  _setScrollPosition() {
-    if(this._data.scrollPosition !== 0) {
-      this.getElement().scrollTop = this._data.scrollPosition;
-    }
+  _setScrollPosition(position) {
+    this.getElement().scrollTop = position;
   }
 
   restoreHandlers() {
     this._setCommentsBlockHandlers();
     this.setChangeDetailsCallback(this._callback.changeDetails);
     this.setCloseClickHandler(this._callback.closeClick);
-    this._setScrollPosition();
+    // this._setScrollPosition();
   }
 }

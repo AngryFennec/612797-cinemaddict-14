@@ -13,6 +13,7 @@ export default class FilmCardPresenter {
     this._closePopup = this._closePopup.bind(this);
     this._onCloseEscPress = this._onCloseEscPress.bind(this);
     this._changeDetails = this._changeDetails.bind(this);
+    this._popupScroll = 0;
   }
 
   init() {
@@ -34,6 +35,7 @@ export default class FilmCardPresenter {
       replace(newPopupInstance, this._popup);
       this._popup = newPopupInstance;
       this._setPopupHandlers();
+      this._popup._setScrollPosition(this._popupScroll);
     }
 
   }
@@ -43,6 +45,7 @@ export default class FilmCardPresenter {
     this._isPopupOpen = true;
     document.body.appendChild(this._popup.getElement());
     this._setPopupHandlers();
+    this._popup._setScrollPosition(this._popupScroll);
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this._onCloseEscPress);
   }
@@ -52,9 +55,11 @@ export default class FilmCardPresenter {
     this._isPopupOpen = false;
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._onCloseEscPress);
+    this._popupScroll = 0;
   }
 
   _setPopupHandlers() {
+    this._popup.getElement().addEventListener('scroll', (evt) => this._popupScroll = evt.target.scrollTop);
     this._popup.setCloseClickHandler(this._closePopup);
     this._popup.setChangeDetailsCallback(this._changeDetails);
   }
