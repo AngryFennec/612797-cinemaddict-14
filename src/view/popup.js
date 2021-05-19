@@ -124,7 +124,7 @@ export const createPopupTemplate = (film) => {
 export default class Popup extends SmartView {
   constructor(film) {
     super();
-    this._data = Popup.parseFilmToData(film);
+    this._data = film;
     this._element = null;
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
@@ -152,7 +152,6 @@ export default class Popup extends SmartView {
 
   _setChangeInputHandler(property) {
     return () => { // стрелочная функция для this
-      this._data = Popup.parseFilmToData();
       this._callback.changeDetails(property);
     };
   }
@@ -170,17 +169,8 @@ export default class Popup extends SmartView {
     addToFavoriteInput.addEventListener('change', this._setChangeInputHandler('favorite'));
   }
 
-  static parseFilmToData(film) {
-    return Object.assign(
-      {},
-      film,
-    );
-  }
-
   reset(film) {
-    this.updateData(
-      Popup.parseFilmToData(film),
-    );
+    this.updateData(film);
   }
 
   _emojiChangeHandler(evt) {
@@ -211,30 +201,18 @@ export default class Popup extends SmartView {
   setCommentSubmitHandler(callback) {
     this._callback.submitComment = callback;
     this.getElement().addEventListener('keydown', this._commentSubmitHandler);
-    this.getElement().querySelector('.film-details__comment-input').focus();
-  }
-
-
-  setScrollPosition(position) {
-    this.getElement().scrollTop = position;
-  }
-
-  setScrollChangeHandler(callback) {
-    this._callback.changeScroll = callback;
-    this.getElement().addEventListener('scroll', this._callback.changeScroll);
   }
 
   restoreHandlers() {
     this.setChangeDetailsCallback(this._callback.changeDetails);
     this.setCloseClickHandler(this._callback.closeClick);
-    this.setScrollChangeHandler(this._callback.changeScroll);
     this.setEmojiChangeHandler(this._callback.changeEmoji);
     this.setCommentInputHandler(this._callback.inputComment);
     this.setCommentSubmitHandler(this._callback.submitComment);
   }
 
   updateElement() {
-    const { scrollTop } = this.getElement();
+    const {scrollTop} = this.getElement();
     super.updateElement();
     this.getElement().scrollTop = scrollTop;
   }
