@@ -6,8 +6,8 @@ import {generateComment} from './comment';
 
 const MAX_DESCRIPTION = 140;
 const MAX_AGE_VALUE = 19;
-const MAX_MINUTE_VALUE = 59;
 const MAX_QUANTITY_VALUE = 5;
+const MAX_MINUTES_VALUE = 300;
 
 const MOCK_SENTENCES = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -91,17 +91,8 @@ const generateRating = () => {
   return (Math.random() * 10).toFixed(1);
 };
 
-const getFormattedDate = (date) => {
-  const month = date.toLocaleString('en-us', { month: 'long' });
-  return `${date.getDate()} ${month} ${date.getFullYear()}`;
-};
-
 const getShortDescription = (description) => {
   return description.length <= MAX_DESCRIPTION ? description : `${description.substring(0, MAX_DESCRIPTION)}...`;
-};
-
-const generateRandomDuration = () => {
-  return `${getRandomInteger(1, MAX_QUANTITY_VALUE)}h ${getRandomInteger(0, MAX_MINUTE_VALUE)}m`;
 };
 
 const getCommentsIdArray = (comments) => {
@@ -119,7 +110,7 @@ export const generateFilm = (id) => {
     title: getRandomArrayElement(MOCK_TITLES),
     rating: generateRating(),
     year: randomDate.getFullYear(),
-    duration: generateRandomDuration(),
+    duration: getRandomInteger(1, MAX_MINUTES_VALUE),
     genre: getRandomArrayElement(MOCK_GENRES),
     shortDescription: getShortDescription(description),
     commentsQuantity: commentsArray.length,
@@ -128,7 +119,7 @@ export const generateFilm = (id) => {
     producer: getRandomArrayElement(MOCK_PERSONS),
     screenWriters: getSubArray(getRandomInteger((1, MAX_QUANTITY_VALUE)), MOCK_PERSONS),
     actors: getSubArray(getRandomInteger((1, MAX_QUANTITY_VALUE)), MOCK_PERSONS),
-    date: getFormattedDate(randomDate),
+    date: randomDate,
     rawDate: randomDate,
     country: getRandomArrayElement(MOCK_COUNTRIES),
     genres: getSubArray(getRandomInteger((1, MAX_QUANTITY_VALUE)), MOCK_GENRES),

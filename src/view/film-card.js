@@ -1,5 +1,6 @@
 import AbstractView from './abstract-view';
 import {UserDetails} from '../utils/presenter';
+import {getFormattedDuration} from '../utils/common';
 
 const BTN_ACTIVE_CLASS = 'film-card__controls-item--active';
 
@@ -15,7 +16,7 @@ export const createFilmCardTemplate = (film) => {
     <p class="film-card__rating">${film.rating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${film.year}</span>
-      <span class="film-card__duration">${film.duration}</span>
+      <span class="film-card__duration">${getFormattedDuration(film.duration)}</span>
       <span class="film-card__genre">${film.genre}</span>
     </p>
     <img src="images/posters/${film.posterUrl}" alt="" class="film-card__poster">

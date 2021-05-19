@@ -1,4 +1,5 @@
 import SmartView from './smart-view';
+import {getFormattedCommentDate, getFormattedDuration, getFormattedReleaseDate} from '../utils/common';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -18,7 +19,7 @@ const createCommentTemplate = (comment) => {
                   <p class="film-details__comment-text">${comment.text}</p>
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${comment.author}</span>
-                    <span class="film-details__comment-day">${comment.date}</span>
+                    <span class="film-details__comment-day">${getFormattedCommentDate(comment.date)}</span>
                     <button class="film-details__comment-delete">Delete</button>
                   </p>
                 </div>
@@ -68,11 +69,11 @@ export const createPopupTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${film.date}</td>
+                  <td class="film-details__cell">${getFormattedReleaseDate(film.date)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${film.duration}</td>
+                  <td class="film-details__cell">${getFormattedDuration(film.duration)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
