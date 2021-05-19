@@ -1,6 +1,7 @@
 import Popup from '../view/popup';
 import FilmCard from '../view/film-card';
 import {render, RenderPosition, replace} from '../utils/render';
+import {nanoid} from 'nanoid';
 
 const ESCAPE = 'Escape';
 
@@ -13,6 +14,8 @@ export default class FilmCardPresenter {
     this._closePopup = this._closePopup.bind(this);
     this._onCloseEscPress = this._onCloseEscPress.bind(this);
     this._changeDetails = this._changeDetails.bind(this);
+    this._emoji = null;
+    this._comment = '';
   }
 
   init() {
@@ -26,11 +29,9 @@ export default class FilmCardPresenter {
     this._filmCard = newFilmCardInstance;
     this._setFilmCardHandlers();
 
-    const newPopupInstance = new Popup(this._film);
     if (this._isPopupOpen) {
-      replace(newPopupInstance, this._popup);
+      this._popup.updateData(this._prepareFilmToPopup(this._film));
     }
-    this._popup = newPopupInstance;
   }
 
   _openPopup() {
@@ -47,9 +48,47 @@ export default class FilmCardPresenter {
     this._isPopupOpen = false;
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._onCloseEscPress);
+    this._emoji = null;
+    this._comment = '';
   }
 
   _setPopupHandlers() {
+    this._popup.setEmojiChangeHandler((evt) => {
+      evt.preventDefault();
+      this._emoji = evt.target.value;
+      this._popup.updateData(this._prepareFilmToPopup(this._film));
+    });
+
+    this._popup.setCommentInputHandler((evt) => {
+      this._comment = evt.target.value;
+    });
+
+    this._popup.setCommentSubmitHandler((evt) => {
+      if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
+        if (!this._emoji || !this._comment.trim()) {
+          return;
+        }
+
+        const commentId = nanoid();
+
+        this._film.comments.push({
+          id: commentId,
+          text: this._comment,
+          emotion: this._emoji,
+          author: 'Author',
+          date: '',
+        });
+
+        this._film.idComments.push(commentId);
+
+        this._film.commentsQuantity = this._film.comments.length;
+        this._comment = '';
+        this._emoji = null;
+        this._popup.updateData(this._prepareFilmToPopup(this._film));
+      }
+
+    });
+
     this._popup.setCloseClickHandler(this._closePopup);
     this._popup.setChangeDetailsCallback(this._changeDetails);
   }
@@ -83,5 +122,16 @@ export default class FilmCardPresenter {
         break;
     }
     this.init();
+  }
+
+  _prepareFilmToPopup(film) {
+    return Object.assign(
+      {},
+      film,
+      {
+        emoji: this._emoji,
+        comment: this._comment,
+      },
+    );
   }
 }

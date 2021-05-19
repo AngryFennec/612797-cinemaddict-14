@@ -1,5 +1,4 @@
-import AbstractView from './abstract-view';
-import {UserDetails} from '../utils/presenter';
+import SmartView from './smart-view';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -90,11 +89,11 @@ export const createPopupTemplate = (film) => {
             </div>
           </div>
           <section class="film-details__controls">
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${film.userDetails.watchlist ? 'checked' : ''}>
             <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${film.userDetails.alreadyWatched ? 'checked' : ''}>
             <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${film.userDetails.favorite ? 'checked' : ''}>
             <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
           </section>
         </div>
@@ -103,9 +102,9 @@ export const createPopupTemplate = (film) => {
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${film.idComments.length}</span></h3>
             ${createCommentsTemplate(film.idComments, film.comments)}
             <div class="film-details__new-comment">
-              <div class="film-details__add-emoji-label"></div>
+              <div class="film-details__add-emoji-label">${film.emoji ? `<img src="images/emoji/${film.emoji}.png" width="55" height="55" alt="emoji-${film.emoji}">` : ''}</div>
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.comment ? film.comment : ''}</textarea>
               </label>
               <div class="film-details__emoji-list">
               ${['smile', 'sleeping', 'puke', 'angry'].map((item) => {
@@ -122,19 +121,23 @@ export const createPopupTemplate = (film) => {
     </section>`;
 };
 
-export default class Popup extends AbstractView {
+export default class Popup extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    this._data = film;
     this._element = null;
     this._closeClickHandler = this._closeClickHandler.bind(this);
-    this.getElement().querySelector('#watchlist').checked = this._film.userDetails.watchlist;
-    this.getElement().querySelector('#watched').checked = this._film.userDetails.alreadyWatched;
-    this.getElement().querySelector('#favorite').checked =  this._film.userDetails.favorite;
+    this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
+    this._setChangeInputHandler = this._setChangeInputHandler.bind(this);
+    this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
   }
 
   getTemplate() {
-    return createPopupTemplate(this._film);
+    return createPopupTemplate(this._data);
   }
 
   _closeClickHandler() {
@@ -150,12 +153,12 @@ export default class Popup extends AbstractView {
   _setChangeInputHandler(property) {
     return () => { // стрелочная функция для this
       this._callback.changeDetails(property);
-      this.getElement().querySelector(`#${property}`).checked = this._film.userDetails[UserDetails[property]];
     };
   }
 
   setChangeDetailsCallback(callback) {
     this._callback.changeDetails = callback;
+
     const addToWatchlistInput = this.getElement().querySelector('#watchlist');
     addToWatchlistInput.addEventListener('change', this._setChangeInputHandler('watchlist'));
 
@@ -164,5 +167,53 @@ export default class Popup extends AbstractView {
 
     const addToFavoriteInput = this.getElement().querySelector('#favorite');
     addToFavoriteInput.addEventListener('change', this._setChangeInputHandler('favorite'));
+  }
+
+  reset(film) {
+    this.updateData(film);
+  }
+
+  _emojiChangeHandler(evt) {
+    this._callback.changeEmoji(evt);
+  }
+
+  _commentInputHandler(evt) {
+    this._callback.inputComment(evt);
+  }
+
+  _commentSubmitHandler(evt) {
+    this._callback.submitComment(evt);
+  }
+
+  setEmojiChangeHandler(callback) {
+    this._callback.changeEmoji = callback;
+    const emojiElements = Array.from(this.getElement().querySelectorAll('.film-details__emoji-item'));
+    emojiElements.forEach((item) => item.addEventListener('change', this._emojiChangeHandler));
+  }
+
+  setCommentInputHandler(callback) {
+    this._callback.inputComment = callback;
+    const commentElement = this.getElement().querySelector('.film-details__comment-input');
+    commentElement.addEventListener('input', this._commentInputHandler);
+  }
+
+
+  setCommentSubmitHandler(callback) {
+    this._callback.submitComment = callback;
+    this.getElement().addEventListener('keydown', this._commentSubmitHandler);
+  }
+
+  restoreHandlers() {
+    this.setChangeDetailsCallback(this._callback.changeDetails);
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setEmojiChangeHandler(this._callback.changeEmoji);
+    this.setCommentInputHandler(this._callback.inputComment);
+    this.setCommentSubmitHandler(this._callback.submitComment);
+  }
+
+  updateElement() {
+    const {scrollTop} = this.getElement();
+    super.updateElement();
+    this.getElement().scrollTop = scrollTop;
   }
 }
