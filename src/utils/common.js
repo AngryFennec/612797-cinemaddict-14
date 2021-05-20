@@ -1,3 +1,8 @@
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
+
 const MIN_YEAR_VALUE = 1920;
 
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
@@ -44,4 +49,16 @@ export const formatNumber = (num) => {
   }
   result = dividend + ' ' + result;
   return result;
+};
+
+export const getFormattedDuration = (duration) => {
+  return dayjs.duration({hour: Math.floor(duration / 60), minute: duration % 60}).format('H[h ]mm[m]');
+};
+
+export const getFormattedCommentDate = (date) => {
+  return dayjs(date).format('YYYY/MM/DD HH:mm');
+};
+
+export const getFormattedReleaseDate = (date) => {
+  return dayjs(date).format('DD MMMM YYYY');
 };

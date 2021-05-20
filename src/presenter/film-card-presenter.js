@@ -76,7 +76,7 @@ export default class FilmCardPresenter {
           text: this._comment,
           emotion: this._emoji,
           author: 'Author',
-          date: '',
+          date: Date.now(), //реализация без дополнительного задания
         });
 
         this._film.idComments.push(commentId);
