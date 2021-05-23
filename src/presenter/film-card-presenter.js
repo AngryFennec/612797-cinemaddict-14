@@ -6,14 +6,16 @@ import {nanoid} from 'nanoid';
 const ESCAPE = 'Escape';
 
 export default class FilmCardPresenter {
-  constructor(film, container) {
+  constructor(film, container, changeData) {
     this._container = container;
     this._film = film;
     this._isPopupOpen = false;
+    this._changeData = changeData;
     this._openPopup = this._openPopup.bind(this);
     this._closePopup = this._closePopup.bind(this);
     this._onCloseEscPress = this._onCloseEscPress.bind(this);
     this._changeDetails = this._changeDetails.bind(this);
+    this._changeData = this._changeData.bind(this);
     this._emoji = null;
     this._comment = '';
   }
@@ -63,6 +65,27 @@ export default class FilmCardPresenter {
       this._comment = evt.target.value;
     });
 
+    this._popup.setCommentDeleteHandler((evt) => {
+
+      const deletedId = evt.target.parentElement.dataset.comment;
+
+      const index = this._film.idComments.indexOf(deletedId);
+
+      this._film.comments = [
+        ...this._film.comments.slice(0, index),
+        ...this._film.comments.slice(index + 1),
+      ];
+
+      this._film.idComments = [
+        ...this._film.idComments.slice(0, index),
+        ...this._film.idComments.slice(index + 1),
+      ];
+      this._film.commentsQuantity = this._film.comments;
+
+      this._popup.updateData(this._prepareFilmToPopup(this._film));
+      this._changeData();
+    });
+
     this._popup.setCommentSubmitHandler((evt) => {
       if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
         if (!this._emoji || !this._comment.trim()) {
@@ -85,8 +108,8 @@ export default class FilmCardPresenter {
         this._comment = '';
         this._emoji = null;
         this._popup.updateData(this._prepareFilmToPopup(this._film));
+        this._changeData();
       }
-
     });
 
     this._popup.setCloseClickHandler(this._closePopup);
@@ -121,6 +144,7 @@ export default class FilmCardPresenter {
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
+    this._changeData();
     this.init();
   }
 

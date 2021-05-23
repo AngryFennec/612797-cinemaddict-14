@@ -1,5 +1,6 @@
 import SmartView from './smart-view';
 import {getFormattedCommentDate, getFormattedDuration, getFormattedReleaseDate} from '../utils/common';
+import he from 'he';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -16,8 +17,8 @@ const createCommentTemplate = (comment) => {
                   <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
                 </span>
                 <div>
-                  <p class="film-details__comment-text">${comment.text}</p>
-                  <p class="film-details__comment-info">
+                  <p class="film-details__comment-text">${he.encode(comment.text)}</p>
+                  <p class="film-details__comment-info" data-comment=${comment.id}>
                     <span class="film-details__comment-author">${comment.author}</span>
                     <span class="film-details__comment-day">${getFormattedCommentDate(comment.date)}</span>
                     <button class="film-details__comment-delete">Delete</button>
@@ -135,6 +136,7 @@ export default class Popup extends SmartView {
     this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
     this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
+    this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
   }
 
   getTemplate() {
@@ -182,6 +184,10 @@ export default class Popup extends SmartView {
     this._callback.inputComment(evt);
   }
 
+  _commentDeleteHandler(evt) {
+    this._callback.deleteComment(evt);
+  }
+
   _commentSubmitHandler(evt) {
     this._callback.submitComment(evt);
   }
@@ -204,12 +210,19 @@ export default class Popup extends SmartView {
     this.getElement().addEventListener('keydown', this._commentSubmitHandler);
   }
 
+  setCommentDeleteHandler(callback) {
+    this._callback.deleteComment = callback;
+    const commentElements = Array.from(this.getElement().querySelectorAll('.film-details__comment-delete'));
+    commentElements.forEach((item) => item.addEventListener('click', this._commentDeleteHandler));
+  }
+
   restoreHandlers() {
     this.setChangeDetailsCallback(this._callback.changeDetails);
     this.setCloseClickHandler(this._callback.closeClick);
     this.setEmojiChangeHandler(this._callback.changeEmoji);
     this.setCommentInputHandler(this._callback.inputComment);
     this.setCommentSubmitHandler(this._callback.submitComment);
+    this.setCommentDeleteHandler(this._callback.deleteComment);
   }
 
   updateElement() {

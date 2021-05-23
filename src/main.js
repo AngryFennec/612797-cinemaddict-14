@@ -2,12 +2,12 @@ import {generateFilm} from './mock/film';
 import {getRandomInteger} from './utils/common';
 import {render, RenderPosition} from './utils/render';
 import Profile from './view/profile';
-import Navigation from './view/navigation';
 import Footer from './view/footer';
 import FilmsPresenter from './presenter/films-presenter';
+import FilterPresenter from './presenter/filter-presenter';
 import FilmsModel from './model/films';
+import FilterModel from './model/filter';
 
-const MAX_NAVIGATION_ITEM_VALUE = 20;
 const MOCK_FILMS_QUANTITY = 20;
 const MAX_FILMS_QUANTITY = 100000;
 
@@ -23,10 +23,12 @@ const siteMainElement = document.querySelector('.main');
 render(siteHeaderElement, new Profile(), RenderPosition.BEFOREEND);
 
 // меню
-render(siteMainElement, new Navigation(getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE), getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE), getRandomInteger(1, MAX_NAVIGATION_ITEM_VALUE)), RenderPosition.BEFOREEND);
+const filterModel = new FilterModel();
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
+filterPresenter.init();
 
 // раздел с фильмами
-const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
+const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, filterModel);
 filmsPresenter.init();
 
 // статистика в футере

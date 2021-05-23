@@ -11,7 +11,7 @@ import {
   getTopRatedFilms,
   sortByDate,
   sortById,
-  sortByRating,
+  sortByRating
 } from '../utils/presenter';
 import Sort from '../view/sort';
 
@@ -21,10 +21,10 @@ const MOST_COMMENTED_TITLE = 'Most commented';
 const FILMS_PER_STEP = 5;
 
 export default class FilmsPresenter {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, filterModel) {
     this._filmsContainer = container;
-    this._films = null;
     this._filmsModel = filmsModel;
+    this._filterModel = filterModel;
     this._filmsComponent = new Films();
     this._filmsListComponent = null;
     this._sortComponent = new Sort();
@@ -34,23 +34,40 @@ export default class FilmsPresenter {
     this._filmsEmptyListComponent = new FilmsEmptyList();
     this._showMoreButtonComponent = new ShowMoreBtn();
     this._sortFilms = this._sortFilms.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
   }
 
   init() {
     //сортировка
     render(this._filmsContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
     this._sortComponent.setClickHandler(this._sortFilms);
+
     this._initFilms();
   }
 
   _getFilms() {
+    let filteredFilms = this._filmsModel.getFilms().slice();
+    switch(this._filterModel.getActiveFilter()) {
+      case 'watchlist':
+        filteredFilms = this._filmsModel.getFilms().slice().filter((item) => item.userDetails.watchlist);
+        break;
+      case 'history':
+        filteredFilms = this._filmsModel.getFilms().slice().filter((item) => item.userDetails.alreadyWatched);
+        break;
+      case 'favorites':
+        filteredFilms = this._filmsModel.getFilms().slice().filter((item) => item.userDetails.favorite);
+        break;
+    }
+
     switch (this._currentSortType) {
       case 'date':
-        return this._filmsModel.getFilms().slice().sort(sortByDate);
+        return filteredFilms.sort(sortByDate);
       case 'rating':
-        return this._filmsModel.getFilms().slice().sort(sortByRating);
+        return filteredFilms.sort(sortByRating);
       default:
-        return this._filmsModel.getFilms().slice().sort(sortById);
+        return filteredFilms.sort(sortById);
     }
   }
 
@@ -65,15 +82,15 @@ export default class FilmsPresenter {
     render(this._filmsComponent.getElement(), this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
 
     // секция Top rated
-    this._renderFilmCards(this._topRatedFilmsListComponent.getContainer(), getTopRatedFilms(this._getFilms()));
+    this._renderFilmCards(this._topRatedFilmsListComponent.getContainer(), getTopRatedFilms(this._filmsModel.getFilms()));
 
     // секция Most commented
-    this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), getMostCommentedFilms(this._getFilms()));
+    this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), getMostCommentedFilms(this._filmsModel.getFilms()));
   }
 
   _renderFilmCards(container, films) {
     for (let i = 0; i < films.length; i++) {
-      const filmCardPresenter = new FilmCardPresenter(films[i], container);
+      const filmCardPresenter = new FilmCardPresenter(films[i], container, this._handleModelEvent);
       filmCardPresenter.init();
     }
   }
@@ -105,8 +122,6 @@ export default class FilmsPresenter {
     }
 
     this._filmsListComponent = newFilmsListInstance;
-
-
     const iterator = getNextRenderCardIterator(this._getFilms(), FILMS_PER_STEP);
     const {value: filmsPart} = iterator.next();
     this._renderFilmCards(this._filmsListComponent.getContainer(), filmsPart);
@@ -116,20 +131,12 @@ export default class FilmsPresenter {
     }
   }
 
-  // эта функция оставлена в классе, потому что она передается как коллбэк и в ней дергается метод класса
   _sortFilms(sortType) {
     this._currentSortType = sortType;
-    // switch (sortType) {
-    //   case 'default':
-    //     this._films.sort(sortById);
-    //     break;
-    //   case 'date':
-    //     this._films.sort(sortByDate);
-    //     break;
-    //   case 'rating':
-    //     this._films.sort(sortByRating);
-    //     break;
-    // }
     this._renderFilms();
+  }
+
+  _handleModelEvent() {
+    this._initFilms();
   }
 }
