@@ -19,13 +19,14 @@ export const createNavigationTemplate = (watchListCount, historyCount, favorites
   </nav>`;
 };
 
-export default class Navigation extends AbstractView{
-  constructor(films, activeFilter) {
+export default class Filter extends AbstractView{
+  constructor(filterCounts, activeFilter) {
     super();
+    const {watchlistCount, historyCount, favoritesCount} = filterCounts;
     this._element = null;
-    this._watchListCount = films.filter((item) => item.userDetails.watchlist).length;
-    this._historyCount = films.filter((item) => item.userDetails.alreadyWatched).length;
-    this._favoritesCount = films.filter((item) => item.userDetails.favorite).length;
+    this._watchListCount = watchlistCount;
+    this._historyCount = historyCount;
+    this._favoritesCount = favoritesCount;
     this._activeFilter = activeFilter;
     this._clickHandler = this._clickHandler.bind(this);
     this.setActiveFilter();

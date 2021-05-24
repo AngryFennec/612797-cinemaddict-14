@@ -13,4 +13,8 @@ export default class Comments extends Observer {
   getComments() {
     return this._comments;
   }
+
+  deleteComment(id) {
+    this._comments = this._comments.filter((comment) => comment.id !== id);
+  }
 }

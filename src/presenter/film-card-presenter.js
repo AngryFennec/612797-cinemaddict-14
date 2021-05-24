@@ -20,7 +20,10 @@ export default class FilmCardPresenter {
     this._comment = '';
   }
 
-  init() {
+  init(updatedData) {
+    if (updatedData) {
+      this._film = updatedData;
+    }
     const newFilmCardInstance = new FilmCard(this._film);
     if (!this._filmCard) {
       this._filmCard = newFilmCardInstance;
@@ -82,7 +85,7 @@ export default class FilmCardPresenter {
       ];
       this._film.commentsQuantity = this._film.comments;
 
-      this._popup.updateData(this._prepareFilmToPopup(this._film));
+     // this._popup.updateData(this._prepareFilmToPopup(this._film));
       this._changeData();
     });
 
@@ -91,7 +94,6 @@ export default class FilmCardPresenter {
         if (!this._emoji || !this._comment.trim()) {
           return;
         }
-
         const commentId = nanoid();
 
         this._film.comments.push({
@@ -107,7 +109,7 @@ export default class FilmCardPresenter {
         this._film.commentsQuantity = this._film.comments.length;
         this._comment = '';
         this._emoji = null;
-        this._popup.updateData(this._prepareFilmToPopup(this._film));
+       // this._popup.updateData(this._prepareFilmToPopup(this._film));
         this._changeData();
       }
     });
@@ -145,7 +147,7 @@ export default class FilmCardPresenter {
         break;
     }
     this._changeData();
-    this.init();
+   // this.init();
   }
 
   _prepareFilmToPopup(film) {

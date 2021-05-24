@@ -1,5 +1,5 @@
 import {render, RenderPosition} from '../utils/render';
-import Navigation from '../view/navigation';
+import Filter from '../view/filter';
 
 export default class FilterPresenter {
   constructor(container, filterModel, filmsModel) {
@@ -14,12 +14,21 @@ export default class FilterPresenter {
   }
 
   init() {
-    const newFilterInstance = new Navigation(this._filmsModel.getFilms(), this._filterModel.getActiveFilter());
+
+    const newFilterInstance = new Filter(this._getFilterCounts(), this._filterModel.getActiveFilter());
     if (!this._filterComponent) {
       this._filterComponent = newFilterInstance;
       this._renderFilter();
       return;
     }
+  }
+
+  _getFilterCounts() {
+    return {
+      watchlistCount: this._filmsModel.getFilms().filter((item) => item.userDetails.watchlist).length,
+      historyCount: this._filmsModel.getFilms().filter((item) => item.userDetails.alreadyWatched).length,
+      favoritesCount: this._filmsModel.getFilms().filter((item) => item.userDetails.favorite).length,
+    };
   }
 
   _renderFilter() {

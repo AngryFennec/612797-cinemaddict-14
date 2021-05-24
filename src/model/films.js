@@ -4,6 +4,7 @@ export default class FilmsModel extends Observer {
   constructor() {
     super();
     this._films = [];
+    this._comments = [];
   }
 
   setFilms(films) {
@@ -11,6 +12,22 @@ export default class FilmsModel extends Observer {
   }
 
   getFilms() {
-    return this._films;
+    return this._films.slice();
+  }
+
+  updateFilm(updateType, updateData) {
+    const index = this._films.findIndex((film) => film.id === updateData.id);
+
+    if(index === -1) {
+      throw new Error('no film');
+    }
+
+    this._films = [
+      ...this._films.slice(0, index),
+      updateData,
+      ...this._films.slice(index + 1),
+    ];
+
+    this._notify(updateType, updateData);
   }
 }
