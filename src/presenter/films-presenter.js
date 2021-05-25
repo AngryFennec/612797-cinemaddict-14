@@ -142,16 +142,16 @@ export default class FilmsPresenter {
   }
   // в карточке фильма при изменении данных фильма
   _updateData(updatedFilmData) {
-    this._filmsModel.updateFilm(null, updatedFilmData);
+    this._filmsModel.updateFilm(updatedFilmData);
   }
 
-  _handleModelEvent(updatedFilmData) {
+  _handleModelEvent(event, updatedFilmData) {
     if (!updatedFilmData) {
       return this._initFilms();
     }
     this._currentFilter = this._filterModel.getActiveFilter();
     this._currentSortType = this._sortModel.getSortType();
-    this._filmsModel.updateFilm(updatedFilmData);
+    //this._filmsModel.updateFilm(updatedFilmData);
     const updatedPresenter = this._filmsPresenters.find((item) => item._film.id === updatedFilmData.id);
     updatedPresenter.init(updatedFilmData);
     this._initExtraFilmsSection();
