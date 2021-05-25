@@ -6,19 +6,24 @@ import {nanoid} from 'nanoid';
 const ESCAPE = 'Escape';
 
 export default class FilmCardPresenter {
-  constructor(film, container) {
+  constructor(film, container, changeData) {
     this._container = container;
     this._film = film;
     this._isPopupOpen = false;
+    this._changeData = changeData;
     this._openPopup = this._openPopup.bind(this);
     this._closePopup = this._closePopup.bind(this);
     this._onCloseEscPress = this._onCloseEscPress.bind(this);
     this._changeDetails = this._changeDetails.bind(this);
+    this._changeData = this._changeData.bind(this);
     this._emoji = null;
     this._comment = '';
   }
 
-  init() {
+  init(updatedData) {
+    if (updatedData) {
+      this._film = updatedData;
+    }
     const newFilmCardInstance = new FilmCard(this._film);
     if (!this._filmCard) {
       this._filmCard = newFilmCardInstance;
@@ -54,7 +59,6 @@ export default class FilmCardPresenter {
 
   _setPopupHandlers() {
     this._popup.setEmojiChangeHandler((evt) => {
-      evt.preventDefault();
       this._emoji = evt.target.value;
       this._popup.updateData(this._prepareFilmToPopup(this._film));
     });
@@ -63,12 +67,31 @@ export default class FilmCardPresenter {
       this._comment = evt.target.value;
     });
 
+    this._popup.setCommentDeleteHandler((evt) => {
+      evt.preventDefault();
+
+      const deletedId = evt.target.parentElement.dataset.comment;
+
+      const index = this._film.idComments.indexOf(deletedId);
+
+      this._film.comments = [
+        ...this._film.comments.slice(0, index),
+        ...this._film.comments.slice(index + 1),
+      ];
+
+      this._film.idComments = [
+        ...this._film.idComments.slice(0, index),
+        ...this._film.idComments.slice(index + 1),
+      ];
+      this._film.commentsQuantity = this._film.comments;
+      this._changeData(this._film);
+    });
+
     this._popup.setCommentSubmitHandler((evt) => {
       if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
         if (!this._emoji || !this._comment.trim()) {
           return;
         }
-
         const commentId = nanoid();
 
         this._film.comments.push({
@@ -84,9 +107,8 @@ export default class FilmCardPresenter {
         this._film.commentsQuantity = this._film.comments.length;
         this._comment = '';
         this._emoji = null;
-        this._popup.updateData(this._prepareFilmToPopup(this._film));
+        this._changeData(this._film);
       }
-
     });
 
     this._popup.setCloseClickHandler(this._closePopup);
@@ -121,7 +143,7 @@ export default class FilmCardPresenter {
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
-    this.init();
+    this._changeData(this._film);
   }
 
   _prepareFilmToPopup(film) {
