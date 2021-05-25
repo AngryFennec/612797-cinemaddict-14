@@ -24,7 +24,7 @@ const MOST_COMMENTED_TITLE = 'Most commented';
 const FILMS_PER_STEP = 5;
 
 export default class FilmsPresenter {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, menuClickHandler) {
     this._filmsContainer = container;
     this._filmsModel = filmsModel;
     this._filterModel = new FilterModel();
@@ -41,18 +41,19 @@ export default class FilmsPresenter {
     this._mostCommentedPresenters = [];
     this._currentFilter = 'all';
     this._currentSortType = 'default';
-
+    this._menuClickHandler = menuClickHandler;
+    this._sortPresenter = null;
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._updateData = this._updateData.bind(this);
   }
 
   init() {
     // меню
-    const filterPresenter = new FilterPresenter(this._filmsContainer, this._filterModel, this._filmsModel);
+    const filterPresenter = new FilterPresenter(this._filmsContainer, this._filterModel, this._filmsModel, this._menuClickHandler);
     filterPresenter.init();
     //сортировка
-    const sortPresenter = new SortPresenter(this._filmsContainer, this._sortModel, this._filmsModel);
-    sortPresenter.init();
+    this._sortPresenter = new SortPresenter(this._filmsContainer, this._sortModel, this._filmsModel);
+    this._sortPresenter.init();
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
     this._sortModel.addObserver(this._handleModelEvent);
@@ -166,5 +167,17 @@ export default class FilmsPresenter {
     // секция Most commented
     this._mostCommentedFilmsListComponent.getContainer().innerHTML = '';
     this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), getMostCommentedFilms(this._filmsModel.getFilms()), this._mostCommentedPresenters);
+  }
+
+  showElement() {
+    if (this._filmsComponent.getElement().classList.contains('visually-hidden')) {
+      this._filmsComponent.getElement().classList.remove('visually-hidden');
+    }
+  }
+
+  hideElement() {
+    if (!this._filmsComponent.getElement().classList.contains('visually-hidden')) {
+      this._filmsComponent.getElement().classList.add('visually-hidden');
+    }
   }
 }

@@ -15,7 +15,7 @@ export const createNavigationTemplate = (watchListCount, historyCount, favorites
       <a href="#history" class="main-navigation__item" data-filter="history">History <span class="main-navigation__item-count">${historyCount}</span></a>
       <a href="#favorites" class="main-navigation__item" data-filter="favorites">Favorites <span class="main-navigation__item-count">${favoritesCount}</span></a>
     </div>
-    <a href="#stats" class="main-navigation__additional main-navigation__additional--active">Stats</a>
+    <a href="#stats" class="main-navigation__additional">Stats</a>
   </nav>`;
 };
 
@@ -39,13 +39,26 @@ export default class Filter extends AbstractView{
   _clickHandler(evt) {
     evt.preventDefault();
     const clickedFilter = evt.target.closest('.main-navigation__item');
-    if (!clickedFilter) {
+    const clickedMenu = evt.target.closest('.main-navigation__additional');
+    if (!clickedFilter && !clickedMenu) {
       return;
     }
+
     const filters = Array.from(this.getElement().querySelectorAll('.main-navigation__item'));
     filters.forEach((item) => item.classList.remove('main-navigation__item--active'));
-    clickedFilter.classList.add('main-navigation__item--active');
-    this._callback.click(clickedFilter.dataset.filter);
+
+    if (clickedFilter) {
+      clickedFilter.classList.add('main-navigation__item--active');
+      this._callback.click(clickedFilter.dataset.filter);
+      this._callback.menuClick('filter');
+      return;
+    }
+
+    if (clickedMenu) {
+      clickedMenu.classList.add('main-navigation__additional--active');
+      this._callback.menuClick('stats');
+      return;
+    }
   }
 
   setActiveFilter() {
@@ -55,8 +68,10 @@ export default class Filter extends AbstractView{
     activeElement.classList.add('main-navigation__item--active');
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
+  setClickHandler(callbackNavigation, callbackMenu) {
+    this._callback.click = callbackNavigation;
+    this._callback.menuClick = callbackMenu;
     this.getElement().querySelector('.main-navigation__items').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.main-navigation__additional').addEventListener('click', this._clickHandler);
   }
 }

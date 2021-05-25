@@ -3,16 +3,33 @@ import AbstractView from './abstract-view';
 const SORT_ACTIVE_CLASS = 'sort__button--active';
 export const createSortTemplate = () => {
   return `<ul class="sort">
-    <li><a href="#" class="sort__button sort__button--active" data-sort="default">Sort by default</a></li>
+    <li><a href="#" class="sort__button" data-sort="default">Sort by default</a></li>
     <li><a href="#" class="sort__button" data-sort="date">Sort by date</a></li>
     <li><a href="#" class="sort__button" data-sort="rating">Sort by rating</a></li>
   </ul>`;
 };
 
 export default class Sort extends AbstractView {
-  constructor() {
+  constructor(currentSort) {
     super();
+    console.log(currentSort);
     this._clickHandler = this._clickHandler.bind(this);
+    this._init(currentSort);
+  }
+
+  _init(currentSort) {
+    this._removeActiveClass();
+    switch (currentSort) {
+      case 'date':
+        this.getElement().querySelector('.sort__button[data-sort=date]').classList.add(SORT_ACTIVE_CLASS);
+        break;
+      case 'rating':
+        this.getElement().querySelector('.sort__button[data-sort=rating]').classList.add(SORT_ACTIVE_CLASS);
+        break;
+      default:
+        this.getElement().querySelector('.sort__button[data-sort=default]').classList.add(SORT_ACTIVE_CLASS);
+        break;
+    }
   }
 
   getTemplate() {
