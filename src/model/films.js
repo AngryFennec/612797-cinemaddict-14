@@ -28,6 +28,6 @@ export default class FilmsModel extends Observer {
       ...this._films.slice(index + 1),
     ];
 
-    this._notify(updateData);
+    this._notify(null, updateData);
   }
 }

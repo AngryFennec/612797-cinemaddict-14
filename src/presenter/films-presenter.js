@@ -151,9 +151,10 @@ export default class FilmsPresenter {
     }
     this._currentFilter = this._filterModel.getActiveFilter();
     this._currentSortType = this._sortModel.getSortType();
-    //this._filmsModel.updateFilm(updatedFilmData);
     const updatedPresenter = this._filmsPresenters.find((item) => item._film.id === updatedFilmData.id);
-    updatedPresenter.init(updatedFilmData);
+    if (updatedPresenter) {
+      updatedPresenter.init(updatedFilmData);
+    }
     this._initExtraFilmsSection();
   }
 

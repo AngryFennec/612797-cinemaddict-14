@@ -59,7 +59,6 @@ export default class FilmCardPresenter {
 
   _setPopupHandlers() {
     this._popup.setEmojiChangeHandler((evt) => {
-      evt.preventDefault();
       this._emoji = evt.target.value;
       this._popup.updateData(this._prepareFilmToPopup(this._film));
     });
@@ -85,8 +84,6 @@ export default class FilmCardPresenter {
         ...this._film.idComments.slice(index + 1),
       ];
       this._film.commentsQuantity = this._film.comments;
-
-     // this._popup.updateData(this._prepareFilmToPopup(this._film)); // без этой строки при удалении перезагружается
       this._changeData(this._film);
     });
 
@@ -110,7 +107,6 @@ export default class FilmCardPresenter {
         this._film.commentsQuantity = this._film.comments.length;
         this._comment = '';
         this._emoji = null;
-        //this._popup.updateData(this._prepareFilmToPopup(this._film)); // без этой строки при удалении перезагружается
         this._changeData(this._film);
       }
     });
