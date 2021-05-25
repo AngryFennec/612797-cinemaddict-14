@@ -8,7 +8,7 @@ export default class FilterModel extends Observer {
 
   setActiveFilter(filter) {
     this._activeFilter = filter;
-    this._notify(null, filter);
+    this._notify();
   }
 
   getActiveFilter() {

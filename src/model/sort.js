@@ -8,7 +8,7 @@ export default class SortModel extends Observer {
 
   setSortType(type) {
     this._currentSortType = type;
-    this._notify(null, type);
+    this._notify();
   }
 
   getSortType() {

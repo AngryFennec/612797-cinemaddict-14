@@ -85,8 +85,8 @@ export default class FilmCardPresenter {
       ];
       this._film.commentsQuantity = this._film.comments;
 
-     // this._popup.updateData(this._prepareFilmToPopup(this._film));
-      this._changeData();
+      this._popup.updateData(this._prepareFilmToPopup(this._film)); // без этой строки при удалении перезагружается
+      this._changeData(this._film);
     });
 
     this._popup.setCommentSubmitHandler((evt) => {
@@ -109,8 +109,8 @@ export default class FilmCardPresenter {
         this._film.commentsQuantity = this._film.comments.length;
         this._comment = '';
         this._emoji = null;
-       // this._popup.updateData(this._prepareFilmToPopup(this._film));
-        this._changeData();
+        this._popup.updateData(this._prepareFilmToPopup(this._film)); // без этой строки при удалении перезагружается
+        this._changeData(this._film);
       }
     });
 
@@ -146,8 +146,7 @@ export default class FilmCardPresenter {
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
-    this._changeData();
-   // this.init();
+    this._changeData(this._film);
   }
 
   _prepareFilmToPopup(film) {

@@ -43,6 +43,7 @@ export default class FilmsPresenter {
     this._currentSortType = 'default';
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._updateData = this._updateData.bind(this);
   }
 
   init() {
@@ -93,16 +94,12 @@ export default class FilmsPresenter {
 
     render(this._filmsComponent.getElement(), this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
 
-    // секция Top rated
-    this._renderFilmCards(this._topRatedFilmsListComponent.getContainer(), getTopRatedFilms(this._filmsModel.getFilms()), this._topRatedPresenters);
-
-    // секция Most commented
-    this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), getMostCommentedFilms(this._filmsModel.getFilms()), this._mostCommentedPresenters);
+    this._initExtraFilmsSection();
   }
 
   _renderFilmCards(container, films, array) {
     for (let i = 0; i < films.length; i++) {
-      const filmCardPresenter = new FilmCardPresenter(films[i], container, this._handleModelEvent);
+      const filmCardPresenter = new FilmCardPresenter(films[i], container, this._updateData);
       filmCardPresenter.init();
       array.push(filmCardPresenter);
     }
@@ -143,6 +140,10 @@ export default class FilmsPresenter {
       this._renderShowMoreButton(iterator);
     }
   }
+  // в карточке фильма при изменении данных фильма
+  _updateData(updatedFilmData) {
+    this._filmsModel.updateFilm(null, updatedFilmData);
+  }
 
   _handleModelEvent(updatedFilmData) {
     if (!updatedFilmData) {
@@ -153,15 +154,16 @@ export default class FilmsPresenter {
     this._filmsModel.updateFilm(updatedFilmData);
     const updatedPresenter = this._filmsPresenters.find((item) => item._film.id === updatedFilmData.id);
     updatedPresenter.init(updatedFilmData);
+    this._initExtraFilmsSection();
+  }
 
-    const updatedTopRatedPresenter = this._topRatedPresenters.find((item) => item._film.id === updatedFilmData.id);
-    if (updatedTopRatedPresenter) {
-      updatedTopRatedPresenter.init(updatedFilmData);
-    }
+  _initExtraFilmsSection() {
+    // секция Top rated
+    this._topRatedFilmsListComponent.getContainer().innerHTML = '';
+    this._renderFilmCards(this._topRatedFilmsListComponent.getContainer(), getTopRatedFilms(this._filmsModel.getFilms()), this._topRatedPresenters);
 
-    const updatedMostCommentedPresenter = this._mostCommentedPresenters.find((item) => item._film.id === updatedFilmData.id);
-    if (updatedMostCommentedPresenter) {
-      updatedMostCommentedPresenter.init(updatedFilmData);
-    }
+    // секция Most commented
+    this._mostCommentedFilmsListComponent.getContainer().innerHTML = '';
+    this._renderFilmCards(this._mostCommentedFilmsListComponent.getContainer(), getMostCommentedFilms(this._filmsModel.getFilms()), this._mostCommentedPresenters);
   }
 }
