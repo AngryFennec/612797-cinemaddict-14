@@ -21,7 +21,7 @@ let statsComponent;
 
 const menuClickHandler = (menuItem) => {
   if (menuItem === 'stats') {
-    statsComponent = new Stats();// filmsModel.getFilms()
+    statsComponent = new Stats(filmsModel.getFilms());// filmsModel.getFilms()
     render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
     statsComponent.showElement();
     filmsPresenter.hideElement();

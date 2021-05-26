@@ -1,14 +1,15 @@
 import AbstractView from './abstract-view';
-import { Chart } from 'chart.js';
+import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {getUserRank, getDuration, getMostPopularGenre, getGenresCount} from '../utils/common';
 
 
-export const createStatsTemplate = () => {
+export const createStatsTemplate = (films) => {
   return `<section class="statistic">
   <p class="statistic__rank">
     Your rank
     <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">Movie buff</span>
+      <span class="statistic__rank-label">${getUserRank(films)}</span>
   </p>
 
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -38,16 +39,16 @@ export const createStatsTemplate = () => {
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">${films.length} <span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span
+      <p class="statistic__item-text">${Math.floor(getDuration(films) / 60)} <span class="statistic__item-description">h</span> ${getDuration(films) % 60} <span
         class="statistic__item-description">m</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">Sci-Fi</p>
+      <p class="statistic__item-text">${getMostPopularGenre(films)}</p>
     </li>
   </ul>
 
@@ -60,32 +61,39 @@ export const createStatsTemplate = () => {
 
 export default class Stats extends AbstractView {
 
-  constructor() {
+  constructor(films) {
     super();
+    this._watchedFilms = films.filter((item) => item.userDetails.alreadyWatched);
+    this._genres = getGenresCount(this._watchedFilms);
     this._init();
+
   }
 
   _init() {
-    this.createCharts();
+    if (this._watchedFilms.length > 0) {
+      this.createCharts();
+    }
+    getMostPopularGenre(this._watchedFilms);
   }
 
   getTemplate() {
-    return createStatsTemplate();
+    return createStatsTemplate(this._watchedFilms);
   }
+
 
   createCharts() {
     const BAR_HEIGHT = 50;
     const statisticCtx = this.getElement().querySelector('.statistic__chart');
 
-    statisticCtx.height = BAR_HEIGHT * 5;
+    statisticCtx.height = BAR_HEIGHT * this._genres.length;
 
     return new Chart(statisticCtx, {
       plugins: [ChartDataLabels],
       type: 'horizontalBar',
       data: {
-        labels: ['Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'],
+        labels: this._genres.map((item) => item[0]),
         datasets: [{
-          data: [11, 8, 7, 4, 3],
+          data: this._genres.map((item) => item[1]),
           backgroundColor: '#ffe800',
           hoverBackgroundColor: '#ffe800',
           anchor: 'start',

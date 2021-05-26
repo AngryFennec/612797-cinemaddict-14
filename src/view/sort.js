@@ -12,7 +12,6 @@ export const createSortTemplate = () => {
 export default class Sort extends AbstractView {
   constructor(currentSort) {
     super();
-    console.log(currentSort);
     this._clickHandler = this._clickHandler.bind(this);
     this._init(currentSort);
   }
