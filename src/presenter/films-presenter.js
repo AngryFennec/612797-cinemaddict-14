@@ -52,7 +52,7 @@ export default class FilmsPresenter {
     const filterPresenter = new FilterPresenter(this._filmsContainer, this._filterModel, this._filmsModel, this._menuClickHandler);
     filterPresenter.init();
     //сортировка
-    this._sortPresenter = new SortPresenter(this._filmsContainer, this._sortModel, this._filmsModel);
+    this._sortPresenter = new SortPresenter(this._filmsContainer, this._sortModel, this._filmsModel, this._filterModel);
     this._sortPresenter.init();
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -86,7 +86,6 @@ export default class FilmsPresenter {
   }
 
   _initFilms() {
-
     render(this._filmsContainer, this._filmsComponent, RenderPosition.BEFOREEND);
     this._renderFilms();
 
@@ -147,11 +146,23 @@ export default class FilmsPresenter {
   }
 
   _handleModelEvent(event, updatedFilmData) {
-    if (!updatedFilmData) {
+
+    if (event !== 'changeFilm') {
+      if (event !== 'setSort') {
+        this._currentSortType =  'default';
+        this._sortModel.setSortType('default');
+        this._sortPresenter.init();
+      }
       return this._initFilms();
     }
     this._currentFilter = this._filterModel.getActiveFilter();
     this._currentSortType = this._sortModel.getSortType();
+
+    const actualIds = this._getFilms().map((item) => item.id).toString();
+    const currentIds = this._filmsPresenters.map((item) => item._film.id).toString();
+    if (actualIds !== currentIds) {
+      return this._initFilms();
+    }
     const updatedPresenter = this._filmsPresenters.find((item) => item._film.id === updatedFilmData.id);
     if (updatedPresenter) {
       updatedPresenter.init(updatedFilmData);
