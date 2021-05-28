@@ -1,8 +1,16 @@
-import AbstractView from './abstract-view';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getUserRank, getDuration, getMostPopularGenre, getGenresCount} from '../utils/common';
+import dayjs from 'dayjs';
+import {getDuration, getGenresCount, getMostPopularGenre, getUserRank} from '../utils/common';
+import AbstractView from './abstract-view';
 
+export const StatsType = {
+  ALL: 'all',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
 
 export const createStatsTemplate = (films) => {
   return `<section class="statistic">
@@ -16,24 +24,24 @@ export const createStatsTemplate = (films) => {
     <p class="statistic__filters-description">Show stats:</p>
 
     <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-           id="statistic-all-time" value="all-time" checked>
-      <label htmlFor="statistic-all-time" class="statistic__filters-label">All time</label>
+           id="statistic-all-time" value="all-time" data-period="all">
+      <label htmlFor="statistic-all-time" class="statistic__filters-label" data-label="all">All time</label>
 
       <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-             id="statistic-today" value="today">
-        <label htmlFor="statistic-today" class="statistic__filters-label">Today</label>
+             id="statistic-today" value="today" data-period="today">
+        <label htmlFor="statistic-today" class="statistic__filters-label" data-label="today">Today</label>
 
         <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-               id="statistic-week" value="week">
-          <label htmlFor="statistic-week" class="statistic__filters-label">Week</label>
+               id="statistic-week" value="week" data-period="week">
+          <label htmlFor="statistic-week" class="statistic__filters-label" data-label="week">Week</label>
 
           <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-                 id="statistic-month" value="month">
-            <label htmlFor="statistic-month" class="statistic__filters-label">Month</label>
+                 id="statistic-month" value="month" data-period="month">
+            <label htmlFor="statistic-month" class="statistic__filters-label" data-label="month">Month</label>
 
             <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-                   id="statistic-year" value="year">
-              <label htmlFor="statistic-year" class="statistic__filters-label">Year</label>
+                   id="statistic-year" value="year" data-period="year">
+              <label htmlFor="statistic-year" class="statistic__filters-label" data-label="year">Year</label>
   </form>
 
   <ul class="statistic__text-list">
@@ -61,29 +69,74 @@ export const createStatsTemplate = (films) => {
 
 export default class Stats extends AbstractView {
 
-  constructor(films) {
+  constructor(films, period) {
     super();
+    this._period = period;
     this._watchedFilms = films.filter((item) => item.userDetails.alreadyWatched);
-    this._genres = getGenresCount(this._watchedFilms);
+    this._filterClickHandler = this._filterClickHandler.bind(this);
     this._init();
 
   }
 
   _init() {
-    if (this._watchedFilms.length > 0) {
-      this.createCharts();
+    this._filmsInPeriod = this._getFilmsInPeriod();
+    this._genres = getGenresCount(this._filmsInPeriod);
+    this._setActiveInput();
+    this.createCharts();
+    getMostPopularGenre(this._filmsInPeriod);
+  }
+
+  _getFilmsInPeriod() {
+    switch (this._period) {
+      case StatsType.ALL:
+        return this._watchedFilms;
+      case StatsType.TODAY:
+        return this._watchedFilms.filter((item) => item.rawDate >= dayjs());
+      case StatsType.WEEK:
+        return this._watchedFilms.filter((item) => item.rawDate >= dayjs().subtract(7, 'day'));
+      case StatsType.MONTH:
+        return this._watchedFilms.filter((item) => item.rawDate >= dayjs().subtract(1, 'month'));
+      case StatsType.YEAR:
+        return this._watchedFilms.filter((item) => item.rawDate >= dayjs().subtract(1, 'year'));
+
     }
-    getMostPopularGenre(this._watchedFilms);
+  }
+
+  setFilterClickHandler(callback) {
+    this._callback.click = callback;
+    const filters = Array.from(this.getElement().querySelectorAll('.statistic__filters-label'));
+    filters.forEach((item) => {
+      item.addEventListener('click', (evt) => this._filterClickHandler(evt));
+    });
+  }
+
+  _setActiveInput() {
+    const inputs = Array.from(this.getElement().querySelectorAll('.statistic__filters-input'));
+    const clickedInput = inputs.find((item) => item.dataset.period === this._period);
+    clickedInput.checked = true;
+  }
+
+  _filterClickHandler(evt) {
+    const clickedLabel = evt.target.dataset.label;
+    this._setActiveInput();
+    this._period = clickedLabel;
+    this._callback.click(this._period);
   }
 
   getTemplate() {
-    return createStatsTemplate(this._watchedFilms);
+    return createStatsTemplate(this._filmsInPeriod);
   }
-
 
   createCharts() {
     const BAR_HEIGHT = 50;
     const statisticCtx = this.getElement().querySelector('.statistic__chart');
+    if (this._filmsInPeriod.length === 0) {
+      const context = statisticCtx.getContext('2d');
+
+      context.clearRect(0, 0, statisticCtx.width, statisticCtx.height);
+      context.height = 0;
+      return null;
+    }
 
     statisticCtx.height = BAR_HEIGHT * this._genres.length;
 
