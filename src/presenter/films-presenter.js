@@ -27,6 +27,8 @@ export default class FilmsPresenter {
   constructor(container, filmsModel, menuClickHandler) {
     this._filmsContainer = container;
     this._filmsModel = filmsModel;
+    console.log(this._filmsModel);
+    console.log(this._filmsModel.getFilms());
     this._filterModel = new FilterModel();
     this._sortModel = new SortModel();
 
@@ -86,7 +88,7 @@ export default class FilmsPresenter {
   }
 
   _initFilms() {
-
+    console.log(this._filmsModel.getFilms());
     render(this._filmsContainer, this._filmsComponent, RenderPosition.BEFOREEND);
     this._renderFilms();
 

@@ -19,7 +19,7 @@ export const createFilmCardTemplate = (film) => {
       <span class="film-card__duration">${getFormattedDuration(film.duration)}</span>
       <span class="film-card__genre">${film.genre}</span>
     </p>
-    <img src="images/posters/${film.posterUrl}" alt="" class="film-card__poster">
+    <img src="${film.posterUrl}" alt="" class="film-card__poster">
     <p class="film-card__description">${film.shortDescription}</p>
     <a class="film-card__comments">${film.idComments.length} comments</a>
     <div class="film-card__controls">
