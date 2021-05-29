@@ -4,7 +4,7 @@ import Filter from '../view/filter';
 export default class FilterPresenter {
   constructor(container, filterModel, filmsModel) {
     this._container = container;
-    this._filterClick = this._filterClick.bind(this);
+    this._filterClickHandler = this._filterClickHandler.bind(this);
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
     this._filterModel.addObserver(() => this.init());
@@ -37,10 +37,10 @@ export default class FilterPresenter {
   }
 
   _setFilterHandlers() {
-    this._filterComponent.setClickHandler(this._filterClick);
+    this._filterComponent.setClickHandler(this._filterClickHandler);
   }
 
-  _filterClick(filter) {
+  _filterClickHandler(filter) {
     this._filterModel.setActiveFilter(filter);
   }
 }

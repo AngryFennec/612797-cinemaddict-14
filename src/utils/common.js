@@ -62,3 +62,54 @@ export const getFormattedCommentDate = (date) => {
 export const getFormattedReleaseDate = (date) => {
   return dayjs(date).format('DD MMMM YYYY');
 };
+
+export const getUserRank = (films) => {
+  const watchedFilms = films.length;
+  switch (true) {
+    case watchedFilms >= 1 && watchedFilms <= 10:
+      return 'novice';
+    case watchedFilms >= 11 && watchedFilms <= 20:
+      return 'fan';
+    case watchedFilms >= 21:
+      return 'movie buff';
+    default:
+      return '';
+  }
+};
+
+export const getDuration = (films) => {
+  return films.reduce((sum, current) => {
+    return sum + current.duration;
+  }, 0);
+};
+
+export const getMostPopularGenre = (films) => {
+  const genresCount = getGenresCount(films);
+  return  genresCount && genresCount.length > 0 ? genresCount[0][0] : '';
+};
+
+export const getGenresCount = (films) => {
+  const genresCount = {};
+  films.forEach((item) => {
+    const itemGenres = item.genres;
+    itemGenres.forEach((genre) => {
+
+      let currentCount = 1;
+      if (Object.keys(genresCount) && Object.keys(genresCount).indexOf(genre) !== -1 ) {
+        currentCount += genresCount[genre];
+      }
+      genresCount[genre] = currentCount;
+    });
+
+  });
+  const sorted = [];
+  for (const genre in genresCount) {
+    sorted.push([genre, genresCount[genre]]);
+  }
+
+  sorted.sort((a, b) => {
+    return b[1] - a[1];
+  });
+
+  return sorted;
+};

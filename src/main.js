@@ -12,6 +12,7 @@ const MAX_FILMS_QUANTITY = 100000;
 // создание моковых массивов
 const mockFilms = new Array(MOCK_FILMS_QUANTITY).fill().map((_, i) => generateFilm(i));
 
+
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(mockFilms);
 
@@ -28,3 +29,5 @@ filmsPresenter.init();
 
 // статистика в футере
 render(document.body, new Footer(getRandomInteger(1000, MAX_FILMS_QUANTITY)), RenderPosition.BEFOREEND);
+
+
