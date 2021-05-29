@@ -7,8 +7,13 @@ export default class FilterModel extends Observer {
   }
 
   setActiveFilter(filter) {
+    const switchStats = this._activeFilter === 'stats' && filter !== 'stats' || filter === 'stats';
     this._activeFilter = filter;
-    this._notify('setFilter', filter);
+    if (switchStats) {
+      this._notify('switchStats', filter);
+    } else {
+      this._notify('setFilter', filter);
+    }
   }
 
   getActiveFilter() {

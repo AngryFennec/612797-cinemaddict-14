@@ -7,15 +7,17 @@ export const FilterValues = {
   FAVORITES: 'favorites',
 };
 
-export const createNavigationTemplate = (watchListCount, historyCount, favoritesCount) => {
+const FILTER_ACTIVE_CLASS = 'main-navigation__item--active';
+
+export const createNavigationTemplate = (watchListCount, historyCount, favoritesCount, activeItem) => {
   return `<nav class="main-navigation">
     <div class="main-navigation__items">
-      <a href="#all" class="main-navigation__item" data-filter="all">All movies</a>
-      <a href="#watchlist" class="main-navigation__item" data-filter="watchlist">Watchlist <span class="main-navigation__item-count">${watchListCount}</span></a>
-      <a href="#history" class="main-navigation__item" data-filter="history">History <span class="main-navigation__item-count">${historyCount}</span></a>
-      <a href="#favorites" class="main-navigation__item" data-filter="favorites">Favorites <span class="main-navigation__item-count">${favoritesCount}</span></a>
+      <a href="#all" class="main-navigation__item ${activeItem === FilterValues.ALL ? FILTER_ACTIVE_CLASS : ''}" data-filter="all">All movies</a>
+      <a href="#watchlist" class="main-navigation__item ${activeItem === FilterValues.WATCHLIST ? FILTER_ACTIVE_CLASS : ''}" data-filter="watchlist">Watchlist <span class="main-navigation__item-count">${watchListCount}</span></a>
+      <a href="#history" class="main-navigation__item ${activeItem === FilterValues.HISTORY ? FILTER_ACTIVE_CLASS : ''}" data-filter="history">History <span class="main-navigation__item-count">${historyCount}</span></a>
+      <a href="#favorites" class="main-navigation__item  ${activeItem === FilterValues.FAVORITES ? FILTER_ACTIVE_CLASS : ''}"  data-filter="favorites">Favorites <span class="main-navigation__item-count">${favoritesCount}</span></a>
     </div>
-    <a href="#stats" class="main-navigation__additional">Stats</a>
+    <a href="#stats" data-filter="stats" class="main-navigation__additional  ${activeItem === 'stats' ? 'main-navigation__item--active' : ''}">Stats</a>
   </nav>`;
 };
 
@@ -29,11 +31,10 @@ export default class Filter extends AbstractView{
     this._favoritesCount = favoritesCount;
     this._activeFilter = activeFilter;
     this._clickHandler = this._clickHandler.bind(this);
-    this.setActiveFilter();
   }
 
   getTemplate() {
-    return createNavigationTemplate(this._watchListCount, this._historyCount, this._favoritesCount);
+    return createNavigationTemplate(this._watchListCount, this._historyCount, this._favoritesCount, this._activeFilter);
   }
 
   _clickHandler(evt) {
@@ -44,29 +45,17 @@ export default class Filter extends AbstractView{
       return;
     }
 
-    const filters = Array.from(this.getElement().querySelectorAll('.main-navigation__item'));
-    filters.forEach((item) => item.classList.remove('main-navigation__item--active'));
-
     if (clickedFilter) {
-      clickedFilter.classList.add('main-navigation__item--active');
       this._callback.click(clickedFilter.dataset.filter);
-      this._callback.menuClick('filter');
       return;
     }
 
     if (clickedMenu) {
-      clickedMenu.classList.add('main-navigation__additional--active');
-      this._callback.menuClick('stats');
+      this._callback.click('stats');
       return;
     }
   }
 
-  setActiveFilter() {
-    const filters = Array.from(this.getElement().querySelectorAll('.main-navigation__item'));
-    filters.forEach((item) => item.classList.remove('main-navigation__item--active'));
-    const activeElement = filters.find((item) => item.dataset.filter === this._activeFilter);
-    activeElement.classList.add('main-navigation__item--active');
-  }
 
   setClickHandler(callbackNavigation, callbackMenu) {
     this._callback.click = callbackNavigation;

@@ -1,8 +1,7 @@
 import {generateFilm} from './mock/film';
 import {getRandomInteger} from './utils/common';
-import {render, RenderPosition, replace} from './utils/render';
+import {render, RenderPosition} from './utils/render';
 import Profile from './view/profile';
-import Stats, {StatsType} from './view/stats';
 import Footer from './view/footer';
 import FilmsPresenter from './presenter/films-presenter';
 import FilmsModel from './model/films';
@@ -17,35 +16,6 @@ const mockFilms = new Array(MOCK_FILMS_QUANTITY).fill().map((_, i) => generateFi
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(mockFilms);
 
-let statsComponent;
-
-const menuClickHandler = (menuItem) => {
-  if (menuItem === 'stats') {
-    updateStats(null);
-    statsComponent.showElement();
-    filmsPresenter.hideElement();
-  } else {
-    if (statsComponent) {
-      statsComponent.hideElement();
-    }
-    filmsPresenter.showElement();
-  }
-};
-
-const updateStats = (period) => {
-  const periodProp = period ? period : StatsType.ALL;
-  const newStatsInstance = new Stats(filmsModel.getFilms(), periodProp);
-  if (!statsComponent) {
-    statsComponent = newStatsInstance;
-    render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
-  } else {
-    replace(newStatsInstance, statsComponent);
-    statsComponent = newStatsInstance;
-  }
-  statsComponent.setFilterClickHandler(updateStats);
-};
-
-
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 
@@ -54,7 +24,7 @@ render(siteHeaderElement, new Profile(), RenderPosition.BEFOREEND);
 
 
 // раздел с фильмами
-const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, menuClickHandler);
+const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel);
 filmsPresenter.init();
 
 // статистика в футере

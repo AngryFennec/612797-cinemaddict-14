@@ -17,6 +17,7 @@ import FilterModel from '../model/filter';
 import SortModel from '../model/sort';
 import FilterPresenter from './filter-presenter';
 import SortPresenter from './sort-presenter';
+import Stats, {StatsType} from '../view/stats';
 
 const TOP_RATED_TITLE = 'Top rated';
 const MOST_COMMENTED_TITLE = 'Most commented';
@@ -32,6 +33,7 @@ export default class FilmsPresenter {
 
     this._filmsComponent = new Films();
     this._filmsListComponent = null;
+    this._statsComponent = null;
     this._mostCommentedFilmsListComponent = new FilmsListExtra(MOST_COMMENTED_TITLE);
     this._topRatedFilmsListComponent = new FilmsListExtra(TOP_RATED_TITLE);
     this._filmsEmptyListComponent = new FilmsEmptyList();
@@ -45,6 +47,7 @@ export default class FilmsPresenter {
     this._sortPresenter = null;
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._updateData = this._updateData.bind(this);
+    this._updateStats = this._updateStats.bind(this);
   }
 
   init() {
@@ -56,6 +59,12 @@ export default class FilmsPresenter {
     this._sortPresenter.init();
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver((event, value) => {
+      if (event === 'switchStats') {
+        this._switchStats(value);
+      }
+    });
+
     this._sortModel.addObserver(this._handleModelEvent);
 
     this._initFilms();
@@ -181,14 +190,37 @@ export default class FilmsPresenter {
   }
 
   showElement() {
-    if (this._filmsComponent.getElement().classList.contains('visually-hidden')) {
-      this._filmsComponent.getElement().classList.remove('visually-hidden');
-    }
+    this._filmsComponent.show();
   }
 
   hideElement() {
-    if (!this._filmsComponent.getElement().classList.contains('visually-hidden')) {
-      this._filmsComponent.getElement().classList.add('visually-hidden');
+    this._filmsComponent.hide();
+  }
+
+  _switchStats(menuItem) {
+    if (menuItem === 'stats') {
+      this._updateStats(null);
+      this._statsComponent.show();
+      this.hideElement();
+    } else {
+      if (this._statsComponent) {
+        this._statsComponent.hide();
+      }
+      this.showElement();
     }
   }
+
+  _updateStats(period) {
+    const periodProp = period ? period : StatsType.ALL;
+    const newStatsInstance = new Stats(this._filmsModel.getFilms(), periodProp);
+    if (!this._statsComponent) {
+      this._statsComponent = newStatsInstance;
+      render(this._filmsContainer, this._statsComponent, RenderPosition.BEFOREEND);
+    } else {
+      replace(newStatsInstance, this._statsComponent);
+      this._statsComponent = newStatsInstance;
+    }
+    this._statsComponent.setFilterClickHandler(this._updateStats);
+  }
+
 }

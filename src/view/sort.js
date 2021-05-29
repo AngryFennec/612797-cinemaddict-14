@@ -14,23 +14,7 @@ export default class Sort extends AbstractView {
     super();
     this._currentSort = sortType;
     this._clickHandler = this._clickHandler.bind(this);
-  //  this._init(currentSort);
   }
-
-  // _init(currentSort) {
-  //   this._removeActiveClass();
-  //   switch (currentSort) {
-  //     case 'date':
-  //       this.getElement().querySelector('.sort__button[data-sort=date]').classList.add(SORT_ACTIVE_CLASS);
-  //       break;
-  //     case 'rating':
-  //       this.getElement().querySelector('.sort__button[data-sort=rating]').classList.add(SORT_ACTIVE_CLASS);
-  //       break;
-  //     default:
-  //       this.getElement().querySelector('.sort__button[data-sort=default]').classList.add(SORT_ACTIVE_CLASS);
-  //       break;
-  //   }
-  // }
 
   getTemplate() {
     return createSortTemplate(this._currentSort);
@@ -41,21 +25,12 @@ export default class Sort extends AbstractView {
     this.getElement().addEventListener('click', this._clickHandler);
   }
 
-  _removeActiveClass() {
-    const activeSortElement = this.getElement().querySelector(`.${SORT_ACTIVE_CLASS}`);
-    if (activeSortElement) {
-      activeSortElement.classList.remove(SORT_ACTIVE_CLASS);
-    }
-  }
-
   _clickHandler(evt) {
     evt.preventDefault();
     const clickedSortButton = evt.target.closest('.sort__button:not(.sort__button--active');
     if (!clickedSortButton) {
       return;
     }
-    //this._removeActiveClass();
-    //clickedSortButton.classList.add(SORT_ACTIVE_CLASS);
     this._callback.click(clickedSortButton.dataset.sort);
   }
 }
