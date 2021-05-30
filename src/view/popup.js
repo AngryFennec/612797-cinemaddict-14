@@ -17,7 +17,7 @@ const createCommentTemplate = (comment) => {
                   <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
                 </span>
                 <div>
-                  <p class="film-details__comment-text">${he.encode(comment.text)}</p>
+                  <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
                   <p class="film-details__comment-info" data-comment=${comment.id}>
                     <span class="film-details__comment-author">${comment.author}</span>
                     <span class="film-details__comment-day">${getFormattedCommentDate(comment.date)}</span>
@@ -42,7 +42,7 @@ export const createPopupTemplate = (film) => {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${film.fullPosterUrl}" alt="">
+              <img class="film-details__poster-img" src="${film.fullPosterUrl}" alt="">
               <p class="film-details__age">${film.ageLimit}+</p>
             </div>
             <div class="film-details__info">
@@ -124,9 +124,9 @@ export const createPopupTemplate = (film) => {
 };
 
 export default class Popup extends SmartView {
-  constructor(film) {
+  constructor(data) {
     super();
-    this._data = film;
+    this._data = data;
     this._element = null;
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._emojiChangeHandler = this._emojiChangeHandler.bind(this);
