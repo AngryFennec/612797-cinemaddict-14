@@ -25,12 +25,11 @@ const MOST_COMMENTED_TITLE = 'Most commented';
 const FILMS_PER_STEP = 5;
 
 export default class FilmsPresenter {
-  constructor(container, filmsModel, menuClickHandler) {
+  constructor(container, filmsModel) {
     this._filmsContainer = container;
     this._filmsModel = filmsModel;
     this._filterModel = new FilterModel();
     this._sortModel = new SortModel();
-
     this._filmsComponent = new Films();
     this._filmsListComponent = null;
     this._statsComponent = null;
@@ -41,9 +40,6 @@ export default class FilmsPresenter {
     this._filmsPresenters = [];
     this._topRatedPresenters = [];
     this._mostCommentedPresenters = [];
-    this._currentFilter = 'all';
-    this._currentSortType = 'default';
-    this._menuClickHandler = menuClickHandler;
     this._sortPresenter = null;
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._updateData = this._updateData.bind(this);
@@ -52,7 +48,7 @@ export default class FilmsPresenter {
 
   init() {
     // меню
-    const filterPresenter = new FilterPresenter(this._filmsContainer, this._filterModel, this._filmsModel, this._menuClickHandler);
+    const filterPresenter = new FilterPresenter(this._filmsContainer, this._filterModel, this._filmsModel);
     filterPresenter.init();
     //сортировка
     this._sortPresenter = new SortPresenter(this._filmsContainer, this._sortModel, this._filmsModel, this._filterModel);
@@ -157,15 +153,8 @@ export default class FilmsPresenter {
   _handleModelEvent(event, updatedFilmData) {
 
     if (event !== 'changeFilm') {
-      if (event !== 'setSort') {
-        this._currentSortType =  'default';
-        this._sortModel.setSortType('default');
-        this._sortPresenter.init();
-      }
       return this._initFilms();
     }
-    this._currentFilter = this._filterModel.getActiveFilter();
-    this._currentSortType = this._sortModel.getSortType();
 
     const actualIds = this._getFilms().map((item) => item.id).toString();
     const currentIds = this._filmsPresenters.map((item) => item._film.id).toString();

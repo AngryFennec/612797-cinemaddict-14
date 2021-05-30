@@ -42,7 +42,12 @@ export default class SortPresenter {
     this._sortModel.setSortType(sortType);
   }
 
-  _handleModelEvent() {
-    this.init(this._currentSortType);
+  _handleModelEvent(event) {
+    if (event === 'setFilter' || event === 'switchStats') {
+      this.init('default');
+    }
+    if (event === 'setSort') {
+      this.init(this._currentSortType);
+    }
   }
 }
