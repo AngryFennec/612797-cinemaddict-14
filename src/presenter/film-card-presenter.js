@@ -2,11 +2,12 @@ import Popup from '../view/popup';
 import FilmCard from '../view/film-card';
 import {render, RenderPosition, replace} from '../utils/render';
 import {nanoid} from 'nanoid';
+import {PopupAction, UserAction} from "../utils/api";
 
 const ESCAPE = 'Escape';
 
 export default class FilmCardPresenter {
-  constructor(film, container, changeData) {
+  constructor(film, container, changeData, commentsModel, api) {
     this._container = container;
     this._film = film;
     this._isPopupOpen = false;
@@ -15,6 +16,8 @@ export default class FilmCardPresenter {
     this._closePopup = this._closePopup.bind(this);
     this._onCloseEscPress = this._onCloseEscPress.bind(this);
     this._changeDetails = this._changeDetails.bind(this);
+    this._commentsModel = commentsModel;
+    this._api = api;
     this._changeData = this._changeData.bind(this);
     this._emoji = null;
     this._comment = '';
@@ -40,12 +43,15 @@ export default class FilmCardPresenter {
   }
 
   _openPopup() {
-    this._popup = this._popup || new Popup(this._film);
-    this._isPopupOpen = true;
-    document.body.appendChild(this._popup.getElement());
-    this._setPopupHandlers();
-    document.body.classList.add('hide-overflow');
-    document.addEventListener('keydown', this._onCloseEscPress);
+    this._api.getComments(this._film.id).then((response) => {
+      this._commentsModel.setComments(response);
+      this._popup = this._popup || new Popup(this._prepareFilmToPopup(this._film));
+      this._isPopupOpen = true;
+      document.body.appendChild(this._popup.getElement());
+      this._setPopupHandlers();
+      document.body.classList.add('hide-overflow');
+      document.addEventListener('keydown', this._onCloseEscPress);
+    });
   }
 
   _closePopup() {
@@ -74,17 +80,16 @@ export default class FilmCardPresenter {
 
       const index = this._film.idComments.indexOf(deletedId);
 
-      this._film.comments = [
-        ...this._film.comments.slice(0, index),
-        ...this._film.comments.slice(index + 1),
-      ];
-
       this._film.idComments = [
         ...this._film.idComments.slice(0, index),
         ...this._film.idComments.slice(index + 1),
       ];
-      this._film.commentsQuantity = this._film.comments;
-      this._changeData(this._film);
+
+      const updatedData = {
+        film: this._film,
+        commentId: deletedId,
+      };
+      this._changeData(PopupAction.DELETE_COMMENT, updatedData);
     });
 
     this._popup.setCommentSubmitHandler((evt) => {
@@ -94,20 +99,22 @@ export default class FilmCardPresenter {
         }
         const commentId = nanoid();
 
-        this._film.comments.push({
-          id: commentId,
-          text: this._comment,
-          emotion: this._emoji,
-          author: 'Author',
-          date: Date.now(), //реализация без дополнительного задания
-        });
+        const updatedData = {
+          comment: {
+            id: commentId,
+            comment: this._comment,
+            emotion: this._emoji,
+            author: 'Author',
+            date: Date.now(), //реализация без дополнительного задания
+          },
+          filmId: this._film.id,
+        };
 
         this._film.idComments.push(commentId);
 
-        this._film.commentsQuantity = this._film.comments.length;
         this._comment = '';
         this._emoji = null;
-        this._changeData(this._film);
+        this._changeData(PopupAction.ADD_COMMENT, updatedData);
       }
     });
 
@@ -143,7 +150,7 @@ export default class FilmCardPresenter {
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
-    this._changeData(this._film);
+    this._changeData(PopupAction.UPDATE_MOVIE, this._film);
   }
 
   _prepareFilmToPopup(film) {
@@ -151,6 +158,7 @@ export default class FilmCardPresenter {
       {},
       film,
       {
+        comments: this._commentsModel.getComments(),
         emoji: this._emoji,
         comment: this._comment,
       },

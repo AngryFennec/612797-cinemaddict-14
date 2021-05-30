@@ -1,4 +1,5 @@
 import FilmsList from '../view/films-list';
+import {PopupAction, UserAction} from '../utils/api';
 import {render, RenderPosition, replace} from '../utils/render';
 import Films from '../view/films';
 import FilmsListExtra from '../view/films-list-extra';
@@ -25,9 +26,11 @@ const MOST_COMMENTED_TITLE = 'Most commented';
 const FILMS_PER_STEP = 5;
 
 export default class FilmsPresenter {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, commentsModel, api) {
     this._filmsContainer = container;
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
+    this._api = api;
     this._filterModel = new FilterModel();
     this._sortModel = new SortModel();
     this._filmsComponent = new Films();
@@ -104,7 +107,7 @@ export default class FilmsPresenter {
 
   _renderFilmCards(container, films, array) {
     for (let i = 0; i < films.length; i++) {
-      const filmCardPresenter = new FilmCardPresenter(films[i], container, this._updateData);
+      const filmCardPresenter = new FilmCardPresenter(films[i], container, this._updateData, this._commentsModel, this._api);
       filmCardPresenter.init();
       array.push(filmCardPresenter);
     }
@@ -146,8 +149,27 @@ export default class FilmsPresenter {
     }
   }
   // в карточке фильма при изменении данных фильма
-  _updateData(updatedFilmData) {
-    this._filmsModel.updateFilm(updatedFilmData);
+  _updateData(actionType, updatedFilmData) {
+
+    switch (actionType) {
+      case PopupAction.UPDATE_MOVIE:
+        this._api.updateFilm(updatedFilmData).then((response) => {
+          this._filmsModel.updateFilm(response);
+        });
+        break;
+      case  PopupAction.ADD_COMMENT:
+        this._api.addComment(updatedFilmData.comment, updatedFilmData.filmId).then((response) => {
+          this._commentsModel.setComments(response.comments); // не обновляется список комментов в попапе
+          this._filmsModel.updateFilm(response.movie);
+//          this._filmsPresenters.find((item) => item._film.id === updatedFilmData.filmId).init();
+        });
+        break;
+      case PopupAction.DELETE_COMMENT:
+        this._api.deleteComment(updatedFilmData.commentId).then(() => {
+          this._commentsModel.deleteComment(updatedFilmData.commentId);
+          this._filmsModel.updateFilm(updatedFilmData.film, true);
+        });
+    }
   }
 
   _handleModelEvent(event, updatedFilmData) {

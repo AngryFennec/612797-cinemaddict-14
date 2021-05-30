@@ -91,13 +91,13 @@ export default class Stats extends AbstractView {
       case StatsType.ALL:
         return this._watchedFilms;
       case StatsType.TODAY:
-        return this._watchedFilms.filter((item) => item.rawDate >= dayjs());
+        return this._watchedFilms.filter((item) => item.userDetails.watchingDate >= dayjs());
       case StatsType.WEEK:
-        return this._watchedFilms.filter((item) => item.rawDate >= dayjs().subtract(7, 'day'));
+        return this._watchedFilms.filter((item) => item.userDetails.watchingDate >= dayjs().subtract(7, 'day'));
       case StatsType.MONTH:
-        return this._watchedFilms.filter((item) => item.rawDate >= dayjs().subtract(1, 'month'));
+        return this._watchedFilms.filter((item) => item.userDetails.watchingDate >= dayjs().subtract(1, 'month'));
       case StatsType.YEAR:
-        return this._watchedFilms.filter((item) => item.rawDate >= dayjs().subtract(1, 'year'));
+        return this._watchedFilms.filter((item) => item.userDetails.watchingDate >= dayjs().subtract(1, 'year'));
 
     }
   }

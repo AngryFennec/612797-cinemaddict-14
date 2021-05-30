@@ -113,7 +113,6 @@ export const generateFilm = (id) => {
     duration: getRandomInteger(1, MAX_MINUTES_VALUE),
     genre: getRandomArrayElement(MOCK_GENRES),
     shortDescription: getShortDescription(description),
-    commentsQuantity: commentsArray.length,
     fullPosterUrl: getRandomArrayElement(MOCK_POSTERS),
     originalTitle: getRandomArrayElement(MOCK_ORIGINAL_TITLES),
     producer: getRandomArrayElement(MOCK_PERSONS),
