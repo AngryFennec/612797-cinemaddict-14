@@ -16,9 +16,20 @@ export default class FilmsModel extends Observer {
     return this._films.slice();
   }
 
-  updateFilm(updatedFilm, isNoResponse) {
-    // isNoResponse отвечает за необходимость конвертировать фильм с серверного формата в формат клиента
-    const updateData = isNoResponse ? updatedFilm : FilmsModel.adaptToClient(updatedFilm);
+  setComments(comments) {
+    this._comments = comments.slice();
+  }
+
+  getComments() {
+    return this._comments;
+  }
+
+  deleteComment(id) {
+    this._comments = this._comments.filter((comment) => comment.id !== id);
+  }
+
+  updateFilm(updatedFilm, needConvert) {
+    const updateData = needConvert ? updatedFilm : FilmsModel.adaptToClient(updatedFilm);
     const index = this._films.findIndex((film) => film.id === updateData.id);
 
     if (index === -1) {

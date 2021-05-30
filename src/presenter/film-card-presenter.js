@@ -7,7 +7,7 @@ import {PopupAction} from '../utils/api';
 const ESCAPE = 'Escape';
 
 export default class FilmCardPresenter {
-  constructor(film, container, changeData, commentsModel, api) {
+  constructor(film, container, changeData, filmsModel, api) {
     this._container = container;
     this._film = film;
     this._isPopupOpen = false;
@@ -16,7 +16,7 @@ export default class FilmCardPresenter {
     this._closePopup = this._closePopup.bind(this);
     this._onCloseEscPress = this._onCloseEscPress.bind(this);
     this._changeDetails = this._changeDetails.bind(this);
-    this._commentsModel = commentsModel;
+    this._filmsModel = filmsModel;
     this._api = api;
     this._changeData = this._changeData.bind(this);
     this._emoji = null;
@@ -44,7 +44,7 @@ export default class FilmCardPresenter {
 
   _openPopup() {
     this._api.getComments(this._film.id).then((response) => {
-      this._commentsModel.setComments(response);
+      this._filmsModel.setComments(response);
       this._popup = this._popup || new Popup(this._prepareFilmToPopup(this._film));
       this._isPopupOpen = true;
       document.body.appendChild(this._popup.getElement());
@@ -158,7 +158,7 @@ export default class FilmCardPresenter {
       {},
       film,
       {
-        comments: this._commentsModel.getComments(),
+        comments: this._filmsModel.getComments(),
         emoji: this._emoji,
         comment: this._comment,
       },
