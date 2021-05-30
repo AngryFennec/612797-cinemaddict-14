@@ -1,5 +1,5 @@
 import FilmsList from '../view/films-list';
-import {PopupAction, UserAction} from '../utils/api';
+import {PopupAction} from '../utils/api';
 import {render, RenderPosition, replace} from '../utils/render';
 import Films from '../view/films';
 import FilmsListExtra from '../view/films-list-extra';
@@ -161,7 +161,7 @@ export default class FilmsPresenter {
         this._api.addComment(updatedFilmData.comment, updatedFilmData.filmId).then((response) => {
           this._commentsModel.setComments(response.comments); // не обновляется список комментов в попапе
           this._filmsModel.updateFilm(response.movie);
-//          this._filmsPresenters.find((item) => item._film.id === updatedFilmData.filmId).init();
+          // this._filmsPresenters.find((item) => item._film.id === updatedFilmData.filmId).init();
         });
         break;
       case PopupAction.DELETE_COMMENT:

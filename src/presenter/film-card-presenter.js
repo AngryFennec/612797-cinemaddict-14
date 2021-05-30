@@ -2,7 +2,7 @@ import Popup from '../view/popup';
 import FilmCard from '../view/film-card';
 import {render, RenderPosition, replace} from '../utils/render';
 import {nanoid} from 'nanoid';
-import {PopupAction, UserAction} from "../utils/api";
+import {PopupAction} from '../utils/api';
 
 const ESCAPE = 'Escape';
 
