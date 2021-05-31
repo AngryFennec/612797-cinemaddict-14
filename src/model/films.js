@@ -9,6 +9,7 @@ export default class FilmsModel extends Observer {
     this.modifiedCommentId = null;
     this.isDeleteInProgress = false;
     this.isSubmitInProgress = false;
+    this.isRequestError = false;
   }
 
   setFilms(films) {
@@ -49,6 +50,14 @@ export default class FilmsModel extends Observer {
     this.isSubmitInProgress = false;
   }
 
+  setRequestErrorReaction() {
+    this.isRequestError = true;
+  }
+
+  removeRequestErrorReaction() {
+    this.isRequestError = false;
+  }
+
   updateFilm(updatedFilm, needConvert) {
     const updateData = needConvert ? updatedFilm : FilmsModel.adaptToClient(updatedFilm);
     const index = this._films.findIndex((film) => film.id === updateData.id);
@@ -62,7 +71,6 @@ export default class FilmsModel extends Observer {
       updateData,
       ...this._films.slice(index + 1),
     ];
-
     this._notify('changeFilm', updateData);
   }
 

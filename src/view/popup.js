@@ -103,14 +103,14 @@ export const createPopupTemplate = (film) => {
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${film.idComments.length}</span></h3>
             ${createCommentsTemplate(film.idComments, film.comments, film.modifiedComment.isDeleteInProgress, film.modifiedComment.id)}
-            <div class="film-details__new-comment">
+            <div class="film-details__new-comment ${film.modifiedComment.isRequestError ? 'shake' : ''}">
               <div class="film-details__add-emoji-label">${film.emoji ? `<img src="images/emoji/${film.emoji}.png" width="55" height="55" alt="emoji-${film.emoji}">` : ''}</div>
               <label class="film-details__comment-label">
                 <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.comment ? film.comment : ''}</textarea>
               </label>
               <div class="film-details__emoji-list">
               ${['smile', 'sleeping', 'puke', 'angry'].map((item) => {
-    return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}">
+    return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${film.modifiedComment.isSubmitInProgress ? 'disabled' : ''}>
                 <label class="film-details__emoji-label" for="emoji-${item}">
                   <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
                 </label>`;
