@@ -3,6 +3,8 @@ import FilmCard from '../view/film-card';
 import {render, RenderPosition, replace} from '../utils/render';
 import {nanoid} from 'nanoid';
 import {PopupAction} from '../utils/api';
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast.js';
 
 const ESCAPE = 'Escape';
 
@@ -85,10 +87,17 @@ export default class FilmCardPresenter {
     });
 
     this._popup.setCommentSubmitHandler((evt) => {
+
       if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
         if (!this._emoji || !this._comment.trim()) {
           return;
         }
+
+        if (!isOnline()) {
+          toast('You can\'t save task offline');
+          return;
+        }
+
         const commentId = nanoid();
 
         const updatedData = {
