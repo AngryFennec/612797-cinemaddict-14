@@ -6,6 +6,9 @@ export default class FilmsModel extends Observer {
     super();
     this._films = [];
     this._comments = [];
+    this.modifiedCommentId = null;
+    this.isDeleteInProgress = false;
+    this.isSubmitInProgress = false;
   }
 
   setFilms(films) {
@@ -26,6 +29,24 @@ export default class FilmsModel extends Observer {
 
   deleteComment(id) {
     this._comments = this._comments.filter((comment) => comment.id !== id);
+  }
+
+  setDeleteInProgress(commentId) {
+    this.isDeleteInProgress = true;
+    this.modifiedCommentId = commentId;
+  }
+
+  setDeleteComplete() {
+    this.isDeleteInProgress = false;
+    this.modifiedCommentId = null;
+  }
+
+  setSubmitInProgress() {
+    this.isSubmitInProgress = true;
+  }
+
+  setSubmitComplete() {
+    this.isSubmitInProgress = false;
   }
 
   updateFilm(updatedFilm, needConvert) {

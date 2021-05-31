@@ -161,6 +161,11 @@ export default class FilmCardPresenter {
         comments: this._filmsModel.getComments(),
         emoji: this._emoji,
         comment: this._comment,
+        modifiedComment: {
+          id: this._filmsModel.modifiedCommentId,
+          isDeleteInProgress: this._filmsModel.isDeleteInProgress,
+          isSubmitInProgress: this._filmsModel.isSubmitInProgress,
+        },
       },
     );
   }

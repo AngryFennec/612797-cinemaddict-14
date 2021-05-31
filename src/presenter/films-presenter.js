@@ -163,15 +163,27 @@ export default class FilmsPresenter {
         });
         break;
       case  PopupAction.ADD_COMMENT:
+        this._filmsModel.setSubmitInProgress();
+     //   this._filmsModel.updateFilm(updatedFilmData.film, true);
         this._api.addComment(updatedFilmData.comment, updatedFilmData.filmId).then((response) => {
-          this._filmsModel.setComments(response.comments); // не обновляется список комментов в попапе
+          this._filmsModel.setComments(response.comments);
           this._filmsModel.updateFilm(response.movie);
+          this._filmsModel.setSubmitComplete();
+        }).catch(() => {
+          console.log('no send');
         });
         break;
       case PopupAction.DELETE_COMMENT:
-        this._api.deleteComment(updatedFilmData.commentId).then(() => {
-          this._filmsModel.deleteComment(updatedFilmData.commentId);
-          this._filmsModel.updateFilm(updatedFilmData.film, true);
+        this._filmsModel.setDeleteInProgress(updatedFilmData.commentId);
+        this._filmsModel.updateFilm(updatedFilmData.film, true);
+        this._api.deleteComment(updatedFilmData.commentId).then((response) => {
+          if (response && response.ok) {
+            this._filmsModel.deleteComment(updatedFilmData.commentId);
+            this._filmsModel.updateFilm(updatedFilmData.film, true);
+            this._filmsModel.setDeleteComplete();
+          }
+        }).catch(() => {
+          console.log('no delete');
         });
     }
   }
