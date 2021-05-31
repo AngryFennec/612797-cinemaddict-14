@@ -77,14 +77,6 @@ export default class FilmCardPresenter {
       evt.preventDefault();
 
       const deletedId = evt.target.parentElement.dataset.comment;
-
-      const index = this._film.idComments.indexOf(deletedId);
-
-      this._film.idComments = [
-        ...this._film.idComments.slice(0, index),
-        ...this._film.idComments.slice(index + 1),
-      ];
-
       const updatedData = {
         film: this._film,
         commentId: deletedId,
@@ -107,10 +99,9 @@ export default class FilmCardPresenter {
             author: 'Author',
             date: Date.now(), //реализация без дополнительного задания
           },
-          filmId: this._film.id,
+          film: this._film,
         };
 
-        this._film.idComments.push(commentId);
 
         this._comment = '';
         this._emoji = null;
@@ -159,8 +150,14 @@ export default class FilmCardPresenter {
       film,
       {
         comments: this._filmsModel.getComments(),
-        emoji: this._emoji,
-        comment: this._comment,
+        emoji: this._emoji || null,
+        comment: this._comment || null,
+        modifiedComment: {
+          id: this._filmsModel.modifiedCommentId,
+          isDeleteInProgress: this._filmsModel.isDeleteInProgress,
+          isSubmitInProgress: this._filmsModel.isSubmitInProgress,
+          isRequestError: this._filmsModel.isRequestError,
+        },
       },
     );
   }

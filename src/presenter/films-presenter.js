@@ -163,14 +163,34 @@ export default class FilmsPresenter {
         });
         break;
       case  PopupAction.ADD_COMMENT:
-        this._api.addComment(updatedFilmData.comment, updatedFilmData.filmId).then((response) => {
-          this._filmsModel.setComments(response.comments); // не обновляется список комментов в попапе
+        this._filmsModel.setSubmitInProgress();
+        this._filmsModel.updateFilm(updatedFilmData.film, true);
+        this._api.addComment(updatedFilmData.comment, updatedFilmData.film.id).then((response) => {
+          this._filmsModel.setComments(response.comments);
+          this._filmsModel.setSubmitComplete();
           this._filmsModel.updateFilm(response.movie);
+        }).catch(() => {
+          this._filmsModel.setSubmitComplete();
+          this._filmsModel.setRequestErrorReaction();
+          this._filmsModel.updateFilm(updatedFilmData.film, true);
+          this._filmsModel.removeRequestErrorReaction();
+          this._filmsModel.updateFilm(updatedFilmData.film, true);
         });
         break;
       case PopupAction.DELETE_COMMENT:
+        this._filmsModel.setDeleteInProgress(updatedFilmData.commentId);
+        this._filmsModel.updateFilm(updatedFilmData.film, true);
         this._api.deleteComment(updatedFilmData.commentId).then(() => {
+          const updatedFilmAfterDelete = JSON.parse(JSON.stringify(updatedFilmData));
+          updatedFilmAfterDelete.film.idComments = updatedFilmData.film.idComments.filter((item) => item !== updatedFilmData.commentId);
           this._filmsModel.deleteComment(updatedFilmData.commentId);
+          this._filmsModel.updateFilm(updatedFilmAfterDelete.film, true);
+          this._filmsModel.setDeleteComplete();
+        }).catch(() => {
+          this._filmsModel.setDeleteComplete();
+          this._filmsModel.setRequestErrorReaction();
+          this._filmsModel.updateFilm(updatedFilmData.film, true);
+          this._filmsModel.removeRequestErrorReaction();
           this._filmsModel.updateFilm(updatedFilmData.film, true);
         });
     }
