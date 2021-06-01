@@ -2,7 +2,6 @@ import {getRandomInteger} from './utils/common';
 import {toast} from './utils/toast';
 import {getRandomString} from './utils/api';
 import {render, RenderPosition} from './utils/render';
-import Profile from './view/profile';
 import Footer from './view/footer';
 import FilmsPresenter from './presenter/films-presenter';
 import FilmsModel from './model/films';
@@ -36,13 +35,13 @@ apiWithProvider.getFilms().then((films) => {
   filmsModel.setFilms(films);
   // раздел с фильмами
 
-
   const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, apiWithProvider, siteHeaderElement);
   filmsPresenter.init();
-});
 
-// статистика в футере
-render(document.body, new Footer(getRandomInteger(1000, MAX_FILMS_QUANTITY)), RenderPosition.BEFOREEND);
+  // статистика в футере
+  render(document.body, new Footer(filmsModel.getFilms().length), RenderPosition.BEFOREEND);
+
+});
 
 window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');
