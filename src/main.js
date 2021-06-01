@@ -1,4 +1,6 @@
-import {getRandomInteger, getRandomString} from './utils/common';
+import {getRandomInteger} from './utils/common';
+import {toast} from './utils/toast';
+import {getRandomString} from './utils/api';
 import {render, RenderPosition} from './utils/render';
 import Profile from './view/profile';
 import Footer from './view/footer';
@@ -50,8 +52,10 @@ window.addEventListener('load', () => {
 window.addEventListener('online', () => {
   document.title = document.title.replace(' [offline]', '');
   apiWithProvider.sync();
+  toast('Connection restored');
 });
 
 window.addEventListener('offline', () => {
   document.title += ' [offline]';
+  toast('Connection lost');
 });
