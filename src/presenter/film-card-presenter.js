@@ -78,6 +78,11 @@ export default class FilmCardPresenter {
     this._popup.setCommentDeleteHandler((evt) => {
       evt.preventDefault();
 
+      if (!isOnline()) {
+        toast('You can\'t delete comment offline');
+        return;
+      }
+
       const deletedId = evt.target.parentElement.dataset.comment;
       const updatedData = {
         film: this._film,
@@ -94,7 +99,7 @@ export default class FilmCardPresenter {
         }
 
         if (!isOnline()) {
-          toast('You can\'t save task offline');
+          toast('You can\'t save film offline');
           return;
         }
 
