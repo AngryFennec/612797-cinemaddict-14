@@ -1,39 +1,15 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
-const MIN_YEAR_VALUE = 1920;
-
-// Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
 
   return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-export const getRandomArrayElement = (array) => {
-  return array[getRandomInteger(0, array.length - 1)];
-};
-
-export const getShuffledArray = (array) => {
-  const shuffledArray = array.slice();
-  for (let i = shuffledArray.length - 1; i > 0; i--) {
-    const randomPosition = Math.floor(Math.random() * i);
-    [shuffledArray[i], shuffledArray[randomPosition]] = [shuffledArray[randomPosition], shuffledArray[i]];
-  }
-  return shuffledArray;
-};
-
-export const getSubArray = (quantity, array) => {
-  return quantity > array ? array : getShuffledArray(array).slice(0, quantity);
-};
-
-export const generateRandomDate = () => {
-  const start = new Date(MIN_YEAR_VALUE, 0, 1);
-  const end = new Date();
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
 export const formatNumber = (num) => {
@@ -56,7 +32,7 @@ export const getFormattedDuration = (duration) => {
 };
 
 export const getFormattedCommentDate = (date) => {
-  return dayjs(date).format('YYYY/MM/DD HH:mm');
+  return dayjs(date).fromNow();
 };
 
 export const getFormattedReleaseDate = (date) => {

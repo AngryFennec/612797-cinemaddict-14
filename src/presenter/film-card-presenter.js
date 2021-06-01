@@ -99,7 +99,12 @@ export default class FilmCardPresenter {
         }
 
         if (!isOnline()) {
-          toast('You can\'t save film offline');
+          toast('You can\'t save comment offline');
+          this._filmsModel.setSubmitComplete();
+          this._filmsModel.setRequestErrorReaction();
+          this._filmsModel.updateFilm(this._film, true);
+          this._filmsModel.removeRequestErrorReaction();
+          this._filmsModel.updateFilm(this._film, true);
           return;
         }
 
@@ -111,7 +116,7 @@ export default class FilmCardPresenter {
             comment: this._comment,
             emotion: this._emoji,
             author: 'Author',
-            date: Date.now(), //реализация без дополнительного задания
+            date: Date.now(),
           },
           film: this._film,
         };

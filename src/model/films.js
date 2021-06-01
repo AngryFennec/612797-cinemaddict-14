@@ -71,6 +71,7 @@ export default class FilmsModel extends Observer {
       updateData,
       ...this._films.slice(index + 1),
     ];
+    console.log(updatedFilm);
     this._notify('changeFilm', updateData);
   }
 

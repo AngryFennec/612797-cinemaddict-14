@@ -63,7 +63,7 @@ export default class Provider {
     if (isOnline()) {
       return this._api.updateFilm(film)
         .then((updatedFilm) => {
-          this._store.setItem(this._storedFilms, updatedFilm.id, FilmsModel.adaptToServer(updatedFilm));
+          this._store.setItem(this._storedFilms, updatedFilm.id, updatedFilm);
           return updatedFilm;
         });
     }
@@ -77,13 +77,9 @@ export default class Provider {
     if (isOnline()) {
       return this._api.addComment(filmId, comment)
         .then((response) => {
-          this._store.setItem(this._storedFilms, filmId, FilmsModel.adaptToServer(response.movie));
+          this._store.setItem(this._storedFilms, filmId, response.movie);
           this._store.setItem(this._storedComments, filmId, response.comments);
-
-          return {
-            film: response.movie,
-            comments: response.comments,
-          };
+          return response;
         });
     }
 

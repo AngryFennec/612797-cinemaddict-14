@@ -44,6 +44,8 @@ export default class FilmsPresenter {
     this._topRatedPresenters = [];
     this._mostCommentedPresenters = [];
     this._sortPresenter = null;
+    this._wasZeroRating = false;
+    this._wasZeroComments = false;
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._updateData = this._updateData.bind(this);
     this._updateStats = this._updateStats.bind(this);
@@ -100,11 +102,30 @@ export default class FilmsPresenter {
     this._renderFilms();
 
     // дополнительные секции
-    render(this._filmsComponent.getElement(), this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
+    if (!this._isZeroRating()) {
+      render(this._filmsComponent.getElement(), this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
+    } else {
+      this._wasZeroRating = true;
+    }
+    if (!this._isZeroComments()) {
+      render(this._filmsComponent.getElement(), this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
+    } else {
+      this._wasZeroComments = true;
+    }
 
-    render(this._filmsComponent.getElement(), this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
+    if (!this._isZeroRating() || !this._isZeroComments()) {
+      this._initExtraFilmsSection();
+    }
+  }
 
-    this._initExtraFilmsSection();
+  _isZeroRating() {
+    const zeroRatingFilms = this._filmsModel.getFilms().filter((item) => item.rating === 0);
+    return zeroRatingFilms && this._filmsModel.getFilms().length === zeroRatingFilms.length;
+  }
+
+  _isZeroComments() {
+    const zeroCommentsFilms = this._filmsModel.getFilms().filter((item) => item.idComments.length === 0);
+    return zeroCommentsFilms && this._filmsModel.getFilms().length === zeroCommentsFilms.length;
   }
 
   _renderFilmCards(container, films, filmsPresenters) {
@@ -168,6 +189,7 @@ export default class FilmsPresenter {
         this._api.addComment(updatedFilmData.comment, updatedFilmData.film.id).then((response) => {
           this._filmsModel.setComments(response.comments);
           this._filmsModel.setSubmitComplete();
+          console.log(response);
           this._filmsModel.updateFilm(response.movie);
         }).catch(() => {
           this._filmsModel.setSubmitComplete();
@@ -213,6 +235,16 @@ export default class FilmsPresenter {
     this._updatePresenter(updatedPresenter, updatedFilmData);
     this._updatePresenter(updatedTopRatedPresenter, updatedFilmData);
     this._updatePresenter(updatedMostCommentedPresenter, updatedFilmData);
+
+    if (this._wasZeroRating && !this._isZeroRating()) {
+      render(this._filmsComponent.getElement(), this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
+      this._wasZeroRating = false;
+    }
+
+    if (this._wasZeroComments && !this._isZeroComments()) {
+      render(this._filmsComponent.getElement(), this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
+      this._wasZeroComments = false;
+    }
     this._initExtraFilmsSection();
   }
 
