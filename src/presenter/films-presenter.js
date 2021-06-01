@@ -20,6 +20,7 @@ import FilterPresenter from './filter-presenter';
 import SortPresenter from './sort-presenter';
 import Stats, {StatsType} from '../view/stats';
 import FilmsModel from '../model/films';
+import Profile from "../view/profile";
 
 const TOP_RATED_TITLE = 'Top rated';
 const MOST_COMMENTED_TITLE = 'Most commented';
@@ -27,8 +28,9 @@ const MOST_COMMENTED_TITLE = 'Most commented';
 const FILMS_PER_STEP = 5;
 
 export default class FilmsPresenter {
-  constructor(container, filmsModel, api) {
+  constructor(container, filmsModel, api, profileContainer) {
     this._filmsContainer = container;
+    this._profileContainer = profileContainer;
     this._filmsModel = filmsModel;
     this._api = api;
     this._filterModel = new FilterModel();
@@ -93,6 +95,13 @@ export default class FilmsPresenter {
       default:
         return filteredFilms.sort(sortById);
     }
+  }
+
+  _renderProfile() {
+    // профиль со званием
+    this._profileContainer.innerHTML = '';
+    render(this._profileContainer, new Profile(this._filmsModel.getFilms()), RenderPosition.BEFOREEND);
+
   }
 
   _initFilms() {
@@ -181,6 +190,7 @@ export default class FilmsPresenter {
       case PopupAction.UPDATE_MOVIE:
         this._api.updateFilm(FilmsModel.adaptToServer(updatedFilmData)).then((response) => {
           this._filmsModel.updateFilm(response);
+          this._renderProfile();
         });
         break;
       case  PopupAction.ADD_COMMENT:
@@ -207,7 +217,7 @@ export default class FilmsPresenter {
           this._filmsModel.deleteComment(updatedFilmData.commentId);
           this._filmsModel.updateFilm(updatedFilmAfterDelete.film, true);
           this._filmsModel.setDeleteComplete();
-        }).catch((err) => {
+        }).catch(() => {
           this._filmsModel.setDeleteComplete();
           this._filmsModel.setRequestErrorReaction();
           this._filmsModel.updateFilm(updatedFilmData.film, true);

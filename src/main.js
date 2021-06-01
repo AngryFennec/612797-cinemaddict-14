@@ -26,19 +26,18 @@ const api = new Api(END_POINT, authorizationString);
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
+const filmsModel = new FilmsModel();
+
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
-
-// профиль со званием
-render(siteHeaderElement, new Profile(), RenderPosition.BEFOREEND);
-
-const filmsModel = new FilmsModel();
 
 
 apiWithProvider.getFilms().then((films) => {
   filmsModel.setFilms(films);
   // раздел с фильмами
-  const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, apiWithProvider);
+
+
+  const filmsPresenter = new FilmsPresenter(siteMainElement, filmsModel, apiWithProvider, siteHeaderElement);
   filmsPresenter.init();
 });
 

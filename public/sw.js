@@ -12,7 +12,7 @@ self.addEventListener('install', (evt) => {
         return cache.addAll([
           '/',
           '/index.html',
-       //   '/bundle.js',
+          '/bundle.js',
           '/css/normalize.css',
           '/css/main.css',
           '/fonts/OpenSans-Bold.woff2',
