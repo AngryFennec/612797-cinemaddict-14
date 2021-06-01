@@ -15,11 +15,11 @@ const createStoreStructure = (items) => {
 };
 
 export default class Provider {
-  constructor(api, store, storedFilms, storedComments) {
+  constructor(api, store) {
     this._api = api;
     this._store = store;
-    this._storedFilms = storedFilms;
-    this._storedComments = storedComments;
+    this._storedFilms = this._store.getFilmsKey();
+    this._storedComments = this._store.getCommentsKey();
   }
 
   getFilms() {

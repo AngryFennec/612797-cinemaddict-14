@@ -2,11 +2,21 @@ export default class Store {
   constructor(name, storage) {
     this._storage = storage;
     this._storeName = name;
+    this._filmsKey = `${this._storeName}-films`;
+    this._commentsKey = `${this._storeName}-comments`;
   }
 
-  getItems(ey) {
+  getFilmsKey() {
+    return this._filmsKey;
+  }
+
+  getCommentsKey() {
+    return this._commentsKey;
+  }
+
+  getItems(key) {
     try {
-      return JSON.parse(this._storage.getItem(ey)) || {};
+      return JSON.parse(this._storage.getItem(key)) || {};
     } catch (err) {
       return {};
     }
