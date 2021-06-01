@@ -201,14 +201,13 @@ export default class FilmsPresenter {
       case PopupAction.DELETE_COMMENT:
         this._filmsModel.setDeleteInProgress(updatedFilmData.commentId);
         this._filmsModel.updateFilm(updatedFilmData.film, true);
-        this._api.deleteComment(updatedFilmData.commentId).then(() => {
+        this._api.deleteComment(updatedFilmData.commentId, updatedFilmData.film.id).then(() => {
           const updatedFilmAfterDelete = JSON.parse(JSON.stringify(updatedFilmData));
           updatedFilmAfterDelete.film.idComments = updatedFilmData.film.idComments.filter((item) => item !== updatedFilmData.commentId);
           this._filmsModel.deleteComment(updatedFilmData.commentId);
-          console.log(updatedFilmAfterDelete);
           this._filmsModel.updateFilm(updatedFilmAfterDelete.film, true);
           this._filmsModel.setDeleteComplete();
-        }).catch(() => {
+        }).catch((err) => {
           this._filmsModel.setDeleteComplete();
           this._filmsModel.setRequestErrorReaction();
           this._filmsModel.updateFilm(updatedFilmData.film, true);

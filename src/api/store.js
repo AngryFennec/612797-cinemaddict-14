@@ -43,7 +43,6 @@ export default class Store {
 
   removeItem(key, itemKey, id) {
     const store = this.getItems(key);
-
     if (id) {
       const comments = store[itemKey];
       store[itemKey] = comments.filter((item) => item.id !== id);

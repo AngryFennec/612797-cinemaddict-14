@@ -89,9 +89,10 @@ export default class Provider {
   deleteComment(commentId, filmId) {
     if (isOnline()) {
       return this._api.deleteComment(commentId)
-        .then(() => this._store.removeItem(this._storedComments, filmId, commentId));
-    }
+        .then(() =>
+          this._store.removeItem(this._storedComments, filmId, commentId));
 
+    }
     this._store.removeItem(this._storedComments, filmId, commentId);
     return Promise.reject(new Error('Delete comment failed'));
   }
