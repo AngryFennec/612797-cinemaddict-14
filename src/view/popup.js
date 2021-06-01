@@ -1,6 +1,7 @@
 import SmartView from './smart-view';
 import {getFormattedCommentDate, getFormattedDuration, getFormattedReleaseDate} from '../utils/common';
 import he from 'he';
+import {CardAction} from '../const.js';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -163,13 +164,13 @@ export default class Popup extends SmartView {
     this._callback.changeDetails = callback;
 
     const addToWatchlistInput = this.getElement().querySelector('#watchlist');
-    addToWatchlistInput.addEventListener('change', this._setChangeInputHandler('watchlist'));
+    addToWatchlistInput.addEventListener('change', this._setChangeInputHandler(CardAction.WATCHLIST));
 
     const addToAlreadyWatchedInput = this.getElement().querySelector('#watched');
-    addToAlreadyWatchedInput.addEventListener('change', this._setChangeInputHandler('watched'));
+    addToAlreadyWatchedInput.addEventListener('change', this._setChangeInputHandler(CardAction.WATCHED));
 
     const addToFavoriteInput = this.getElement().querySelector('#favorite');
-    addToFavoriteInput.addEventListener('change', this._setChangeInputHandler('favorite'));
+    addToFavoriteInput.addEventListener('change', this._setChangeInputHandler(CardAction.FAVORITE));
   }
 
   reset(film) {

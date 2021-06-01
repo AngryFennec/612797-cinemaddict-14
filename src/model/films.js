@@ -1,5 +1,6 @@
 import Observer from '../utils/observer.js';
 import {getShortDescription} from '../utils/api';
+import {EventType} from '../const.js';
 
 export default class FilmsModel extends Observer {
   constructor() {
@@ -71,7 +72,7 @@ export default class FilmsModel extends Observer {
       updateData,
       ...this._films.slice(index + 1),
     ];
-    this._notify('changeFilm', updateData);
+    this._notify(EventType.CHANGE_FILM, updateData);
   }
 
   static adaptToServer(film) {

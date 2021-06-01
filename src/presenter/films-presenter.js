@@ -1,5 +1,5 @@
 import FilmsList from '../view/films-list';
-import {PopupAction} from '../utils/api';
+import {EventType, FilterType, PopupAction, SortType, StatsType} from '../const.js';
 import {render, RenderPosition, replace} from '../utils/render';
 import Films from '../view/films';
 import FilmsListExtra from '../view/films-list-extra';
@@ -18,9 +18,9 @@ import FilterModel from '../model/filter';
 import SortModel from '../model/sort';
 import FilterPresenter from './filter-presenter';
 import SortPresenter from './sort-presenter';
-import Stats, {StatsType} from '../view/stats';
+import Stats from '../view/stats';
 import FilmsModel from '../model/films';
-import Profile from "../view/profile";
+import Profile from '../view/profile';
 
 const TOP_RATED_TITLE = 'Top rated';
 const MOST_COMMENTED_TITLE = 'Most commented';
@@ -63,7 +63,7 @@ export default class FilmsPresenter {
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver((event, value) => {
-      if (event === 'switchStats') {
+      if (event === EventType.SWITCH_STATS) {
         this._switchStats(value);
       }
     });
@@ -76,21 +76,21 @@ export default class FilmsPresenter {
   _getFilms() {
     let filteredFilms = this._filmsModel.getFilms();
     switch (this._filterModel.getActiveFilter()) {
-      case 'watchlist':
+      case FilterType.WATCHLIST:
         filteredFilms = this._filmsModel.getFilms().filter((item) => item.userDetails.watchlist);
         break;
-      case 'history':
+      case FilterType.HISTORY:
         filteredFilms = this._filmsModel.getFilms().filter((item) => item.userDetails.alreadyWatched);
         break;
-      case 'favorites':
+      case FilterType.FAVORITES:
         filteredFilms = this._filmsModel.getFilms().filter((item) => item.userDetails.favorite);
         break;
     }
 
     switch (this._sortModel.getSortType()) {
-      case 'date':
+      case SortType.DATE:
         return filteredFilms.sort(sortByDate);
-      case 'rating':
+      case SortType.RATING:
         return filteredFilms.sort(sortByRating);
       default:
         return filteredFilms.sort(sortById);
@@ -229,7 +229,7 @@ export default class FilmsPresenter {
 
   _handleModelEvent(event, updatedFilmData) {
 
-    if (event !== 'changeFilm') {
+    if (event !== EventType.CHANGE_FILM) {
       return this._initFilms();
     }
 

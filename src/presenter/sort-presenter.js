@@ -1,5 +1,6 @@
 import {render, RenderPosition, replace} from '../utils/render';
 import Sort from '../view/sort';
+import {EventType, SortType} from '../const.js';
 
 export default class SortPresenter {
   constructor(container, sortModel, filmsModel, filterModel) {
@@ -43,10 +44,10 @@ export default class SortPresenter {
   }
 
   _handleModelEvent(event) {
-    if (event === 'setFilter' || event === 'switchStats') {
-      this.init('default');
+    if (event === EventType.SET_FILTER || event === EventType.SWITCH_STATS) {
+      this.init(SortType.DEFAULT);
     }
-    if (event === 'setSort') {
+    if (event === EventType.SET_SORT) {
       this.init(this._currentSortType);
     }
   }

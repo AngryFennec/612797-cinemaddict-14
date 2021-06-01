@@ -1,4 +1,3 @@
-import {getRandomInteger} from './utils/common';
 import {toast} from './utils/toast';
 import {getRandomString} from './utils/api';
 import {render, RenderPosition} from './utils/render';
@@ -8,8 +7,6 @@ import FilmsModel from './model/films';
 import Api from './api/api';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
-
-const MAX_FILMS_QUANTITY = 100000;
 
 const AUTHORIZATION_STRING_LENGTH = 16;
 const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';

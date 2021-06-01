@@ -2,11 +2,9 @@ import Popup from '../view/popup';
 import FilmCard from '../view/film-card';
 import {render, RenderPosition, replace} from '../utils/render';
 import {nanoid} from 'nanoid';
-import {PopupAction} from '../utils/api';
+import {CardAction, KeyValue, PopupAction} from '../const.js';
 import {isOnline} from '../utils/common.js';
 import {toast} from '../utils/toast.js';
-
-const ESCAPE = 'Escape';
 
 export default class FilmCardPresenter {
   constructor(film, container, changeData, filmsModel, api) {
@@ -93,7 +91,7 @@ export default class FilmCardPresenter {
 
     this._popup.setCommentSubmitHandler((evt) => {
 
-      if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
+      if ((evt.ctrlKey || evt.metaKey) && evt.key === KeyValue.ENTER) {
         if (!this._emoji || !this._comment.trim()) {
           return;
         }
@@ -133,7 +131,7 @@ export default class FilmCardPresenter {
   }
 
   _onCloseEscPress(evt) {
-    if (evt.key === ESCAPE) {
+    if (evt.key === KeyValue.ESCAPE) {
       this._closePopup();
     }
   }
@@ -150,13 +148,13 @@ export default class FilmCardPresenter {
 
   _changeDetails(property) {
     switch (property) {
-      case 'watchlist':
+      case CardAction.WATCHLIST:
         this._film.userDetails.watchlist = !this._film.userDetails.watchlist;
         break;
-      case 'watched':
+      case CardAction.WATCHED:
         this._film.userDetails.alreadyWatched = !this._film.userDetails.alreadyWatched;
         break;
-      case 'favorite':
+      case CardAction.FAVORITE:
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }

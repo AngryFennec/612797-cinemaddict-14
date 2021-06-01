@@ -1,22 +1,10 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import {UserRank} from '../const.js';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
-
-export const UserRank = {
-  NOVICE: 'Novice',
-  FAN: 'Fan',
-  MOVIE_BUFF: 'Movie buff',
-};
-
-export const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
 
 export const formatNumber = (num) => {
   if (num < 1000) {
