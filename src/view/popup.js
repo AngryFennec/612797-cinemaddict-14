@@ -1,6 +1,7 @@
 import SmartView from './smart-view';
 import {getFormattedCommentDate, getFormattedDuration, getFormattedReleaseDate} from '../utils/common';
 import he from 'he';
+import {CardAction} from '../const.js';
 
 const createGenreItemTemplate = (item) => {
   return `<span class="film-details__genre">${item}</span>`;
@@ -11,7 +12,7 @@ const createGenresTemplate = (genres) => {
   return `<td class="film-details__cell">${template}</td>`;
 };
 
-const createCommentTemplate = (comment) => {
+const createCommentTemplate = (comment, isDeleteInProgress, deletingCommentId) => {
   return `<li class="film-details__comment">
                 <span class="film-details__comment-emoji">
                   <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
@@ -21,15 +22,15 @@ const createCommentTemplate = (comment) => {
                   <p class="film-details__comment-info" data-comment=${comment.id}>
                     <span class="film-details__comment-author">${comment.author}</span>
                     <span class="film-details__comment-day">${getFormattedCommentDate(comment.date)}</span>
-                    <button class="film-details__comment-delete">Delete</button>
+                    <button class="film-details__comment-delete" ${isDeleteInProgress && comment.id === deletingCommentId ? 'disabled' : ''}>${isDeleteInProgress && comment.id === deletingCommentId ? 'Deleting...' : 'Delete'}</button>
                   </p>
                 </div>
               </li>`;
 };
 
-const createCommentsTemplate = (comments, fullComments) => {
+const createCommentsTemplate = (comments, fullComments, isDeleteInProgress, commentId) => {
   const commentsById = comments.map((id) => fullComments.find((item) => item.id === id));
-  const template = commentsById.map((item) => createCommentTemplate(item)).join(' ');
+  const template = commentsById.map((item) => createCommentTemplate(item, isDeleteInProgress, commentId)).join(' ');
   return `<ul class="film-details__comments-list">${template}</ul>`;
 };
 
@@ -102,15 +103,15 @@ export const createPopupTemplate = (film) => {
         <div class="film-details__bottom-container">
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${film.idComments.length}</span></h3>
-            ${createCommentsTemplate(film.idComments, film.comments)}
-            <div class="film-details__new-comment">
+            ${createCommentsTemplate(film.idComments, film.comments, film.modifiedComment.isDeleteInProgress, film.modifiedComment.id)}
+            <div class="film-details__new-comment ${film.modifiedComment.isRequestError ? 'shake' : ''}">
               <div class="film-details__add-emoji-label">${film.emoji ? `<img src="images/emoji/${film.emoji}.png" width="55" height="55" alt="emoji-${film.emoji}">` : ''}</div>
               <label class="film-details__comment-label">
                 <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.comment ? film.comment : ''}</textarea>
               </label>
               <div class="film-details__emoji-list">
               ${['smile', 'sleeping', 'puke', 'angry'].map((item) => {
-    return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}">
+    return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${film.modifiedComment.isSubmitInProgress ? 'disabled' : ''}>
                 <label class="film-details__emoji-label" for="emoji-${item}">
                   <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
                 </label>`;
@@ -163,13 +164,13 @@ export default class Popup extends SmartView {
     this._callback.changeDetails = callback;
 
     const addToWatchlistInput = this.getElement().querySelector('#watchlist');
-    addToWatchlistInput.addEventListener('change', this._setChangeInputHandler('watchlist'));
+    addToWatchlistInput.addEventListener('change', this._setChangeInputHandler(CardAction.WATCHLIST));
 
     const addToAlreadyWatchedInput = this.getElement().querySelector('#watched');
-    addToAlreadyWatchedInput.addEventListener('change', this._setChangeInputHandler('watched'));
+    addToAlreadyWatchedInput.addEventListener('change', this._setChangeInputHandler(CardAction.WATCHED));
 
     const addToFavoriteInput = this.getElement().querySelector('#favorite');
-    addToFavoriteInput.addEventListener('change', this._setChangeInputHandler('favorite'));
+    addToFavoriteInput.addEventListener('change', this._setChangeInputHandler(CardAction.FAVORITE));
   }
 
   reset(film) {

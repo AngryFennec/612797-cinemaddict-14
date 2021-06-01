@@ -1,10 +1,10 @@
 import AbstractView from './abstract-view';
-import {UserDetails} from '../utils/presenter';
+import {USER_DETAILS} from '../const.js';
 import {getFormattedDuration} from '../utils/common';
 
 const BTN_ACTIVE_CLASS = 'film-card__controls-item--active';
 
-const Modificators = {
+const MODIFICATORS = {
   'watchlist': 'add-to-watchlist',
   'watched': 'mark-as-watched',
   'favorite': 'favorite',
@@ -46,12 +46,12 @@ export default class FilmCard extends AbstractView {
   }
 
   changeBtnState(property) {
-    const btn = this.getElement().querySelector(`.film-card__controls-item--${Modificators[property]}`);
-    if (this._film.userDetails[UserDetails[property]] && !btn.classList.contains(BTN_ACTIVE_CLASS)) {
+    const btn = this.getElement().querySelector(`.film-card__controls-item--${MODIFICATORS[property]}`);
+    if (this._film.userDetails[USER_DETAILS[property]] && !btn.classList.contains(BTN_ACTIVE_CLASS)) {
       btn.classList.add(BTN_ACTIVE_CLASS);
       return;
     }
-    if (!this._film.userDetails[UserDetails[property]]) {
+    if (!this._film.userDetails[USER_DETAILS[property]]) {
       btn.classList.remove(BTN_ACTIVE_CLASS);
     }
   }
@@ -81,13 +81,13 @@ export default class FilmCard extends AbstractView {
 
   setChangeDetailsCallback(callback) {
     this._callback.changeDetails = callback;
-    const addToWatchlistBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['watchlist']}`);
+    const addToWatchlistBtn = this.getElement().querySelector(`.film-card__controls-item--${MODIFICATORS['watchlist']}`);
     addToWatchlistBtn.addEventListener('click', this._setClickBtnHandler('watchlist'));
 
-    const addToAlreadyWatchedBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['watched']}`);
+    const addToAlreadyWatchedBtn = this.getElement().querySelector(`.film-card__controls-item--${MODIFICATORS['watched']}`);
     addToAlreadyWatchedBtn.addEventListener('click', this._setClickBtnHandler('watched'));
 
-    const addToFavoriteBtn = this.getElement().querySelector(`.film-card__controls-item--${Modificators['favorite']}`);
+    const addToFavoriteBtn = this.getElement().querySelector(`.film-card__controls-item--${MODIFICATORS['favorite']}`);
     addToFavoriteBtn.addEventListener('click', this._setClickBtnHandler('favorite'));
   }
 

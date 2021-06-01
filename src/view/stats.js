@@ -3,14 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import dayjs from 'dayjs';
 import {getDuration, getGenresCount, getMostPopularGenre, getUserRank} from '../utils/common';
 import AbstractView from './abstract-view';
-
-export const StatsType = {
-  ALL: 'all',
-  TODAY: 'today',
-  WEEK: 'week',
-  MONTH: 'month',
-  YEAR: 'year',
-};
+import {StatsType} from '../const.js';
 
 export const createStatsTemplate = (films) => {
   return `<section class="statistic">

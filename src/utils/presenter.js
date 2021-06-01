@@ -1,10 +1,4 @@
-const EXTRA_MOCK_FILMS_QUANTITY = 2;
-
-export const UserDetails = {
-  'watchlist': 'watchlist',
-  'watched': 'alreadyWatched',
-  'favorite': 'favorite',
-};
+const EXTRA_FILMS_QUANTITY = 2;
 
 export function getNextRenderCardIterator(filmsData, renderItemAmount) {
   const cardAmount = filmsData.length;
@@ -20,13 +14,13 @@ export function getNextRenderCardIterator(filmsData, renderItemAmount) {
 }
 
 export function getTopRatedFilms(films) {
-  return films.sort(sortByRating).slice(0, EXTRA_MOCK_FILMS_QUANTITY);
+  return films.sort(sortByRating).slice(0, EXTRA_FILMS_QUANTITY);
 }
 
 export function getMostCommentedFilms(films) {
   return films.sort((a, b) => {
     return b.idComments.length - a.idComments.length;
-  }).slice(0, EXTRA_MOCK_FILMS_QUANTITY);
+  }).slice(0, EXTRA_FILMS_QUANTITY);
 }
 
 export function sortById(a, b) {

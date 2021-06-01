@@ -1,11 +1,16 @@
 import Observer from '../utils/observer.js';
 import {getShortDescription} from '../utils/api';
+import {EventType} from '../const.js';
 
 export default class FilmsModel extends Observer {
   constructor() {
     super();
     this._films = [];
     this._comments = [];
+    this.modifiedCommentId = null;
+    this.isDeleteInProgress = false;
+    this.isSubmitInProgress = false;
+    this.isRequestError = false;
   }
 
   setFilms(films) {
@@ -28,6 +33,32 @@ export default class FilmsModel extends Observer {
     this._comments = this._comments.filter((comment) => comment.id !== id);
   }
 
+  setDeleteInProgress(commentId) {
+    this.isDeleteInProgress = true;
+    this.modifiedCommentId = commentId;
+  }
+
+  setDeleteComplete() {
+    this.isDeleteInProgress = false;
+    this.modifiedCommentId = null;
+  }
+
+  setSubmitInProgress() {
+    this.isSubmitInProgress = true;
+  }
+
+  setSubmitComplete() {
+    this.isSubmitInProgress = false;
+  }
+
+  setRequestErrorReaction() {
+    this.isRequestError = true;
+  }
+
+  removeRequestErrorReaction() {
+    this.isRequestError = false;
+  }
+
   updateFilm(updatedFilm, needConvert) {
     const updateData = needConvert ? updatedFilm : FilmsModel.adaptToClient(updatedFilm);
     const index = this._films.findIndex((film) => film.id === updateData.id);
@@ -41,8 +72,7 @@ export default class FilmsModel extends Observer {
       updateData,
       ...this._films.slice(index + 1),
     ];
-
-    this._notify('changeFilm', updateData);
+    this._notify(EventType.CHANGE_FILM, updateData);
   }
 
   static adaptToServer(film) {

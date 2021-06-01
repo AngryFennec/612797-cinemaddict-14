@@ -1,9 +1,7 @@
-const MAX_DESCRIPTION = 140;
+import {MAX_DESCRIPTION} from '../const.js';
 
-export const PopupAction = {
-  UPDATE_MOVIE: 'updateMovie',
-  ADD_COMMENT: 'addComment',
-  DELETE_COMMENT: 'deleteComment',
+export const getRandomString = (length) => {
+  return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, length);
 };
 
 export const getShortDescription = (description) => {

@@ -2,9 +2,9 @@ import Popup from '../view/popup';
 import FilmCard from '../view/film-card';
 import {render, RenderPosition, replace} from '../utils/render';
 import {nanoid} from 'nanoid';
-import {PopupAction} from '../utils/api';
-
-const ESCAPE = 'Escape';
+import {CardAction, KeyValue, PopupAction} from '../const.js';
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast.js';
 
 export default class FilmCardPresenter {
   constructor(film, container, changeData, filmsModel, api) {
@@ -76,15 +76,12 @@ export default class FilmCardPresenter {
     this._popup.setCommentDeleteHandler((evt) => {
       evt.preventDefault();
 
+      if (!isOnline()) {
+        toast('You can\'t delete comment offline');
+        return;
+      }
+
       const deletedId = evt.target.parentElement.dataset.comment;
-
-      const index = this._film.idComments.indexOf(deletedId);
-
-      this._film.idComments = [
-        ...this._film.idComments.slice(0, index),
-        ...this._film.idComments.slice(index + 1),
-      ];
-
       const updatedData = {
         film: this._film,
         commentId: deletedId,
@@ -93,10 +90,22 @@ export default class FilmCardPresenter {
     });
 
     this._popup.setCommentSubmitHandler((evt) => {
-      if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter') {
+
+      if ((evt.ctrlKey || evt.metaKey) && evt.key === KeyValue.ENTER) {
         if (!this._emoji || !this._comment.trim()) {
           return;
         }
+
+        if (!isOnline()) {
+          toast('You can\'t save comment offline');
+          this._filmsModel.setSubmitComplete();
+          this._filmsModel.setRequestErrorReaction();
+          this._filmsModel.updateFilm(this._film, true);
+          this._filmsModel.removeRequestErrorReaction();
+          this._filmsModel.updateFilm(this._film, true);
+          return;
+        }
+
         const commentId = nanoid();
 
         const updatedData = {
@@ -105,12 +114,11 @@ export default class FilmCardPresenter {
             comment: this._comment,
             emotion: this._emoji,
             author: 'Author',
-            date: Date.now(), //реализация без дополнительного задания
+            date: Date.now(),
           },
-          filmId: this._film.id,
+          film: this._film,
         };
 
-        this._film.idComments.push(commentId);
 
         this._comment = '';
         this._emoji = null;
@@ -123,7 +131,7 @@ export default class FilmCardPresenter {
   }
 
   _onCloseEscPress(evt) {
-    if (evt.key === ESCAPE) {
+    if (evt.key === KeyValue.ESCAPE) {
       this._closePopup();
     }
   }
@@ -140,13 +148,13 @@ export default class FilmCardPresenter {
 
   _changeDetails(property) {
     switch (property) {
-      case 'watchlist':
+      case CardAction.WATCHLIST:
         this._film.userDetails.watchlist = !this._film.userDetails.watchlist;
         break;
-      case 'watched':
+      case CardAction.WATCHED:
         this._film.userDetails.alreadyWatched = !this._film.userDetails.alreadyWatched;
         break;
-      case 'favorite':
+      case CardAction.FAVORITE:
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
@@ -159,8 +167,14 @@ export default class FilmCardPresenter {
       film,
       {
         comments: this._filmsModel.getComments(),
-        emoji: this._emoji,
-        comment: this._comment,
+        emoji: this._emoji || null,
+        comment: this._comment || null,
+        modifiedComment: {
+          id: this._filmsModel.modifiedCommentId,
+          isDeleteInProgress: this._filmsModel.isDeleteInProgress,
+          isSubmitInProgress: this._filmsModel.isSubmitInProgress,
+          isRequestError: this._filmsModel.isRequestError,
+        },
       },
     );
   }
