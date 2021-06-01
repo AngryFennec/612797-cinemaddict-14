@@ -189,7 +189,6 @@ export default class FilmsPresenter {
         this._api.addComment(updatedFilmData.comment, updatedFilmData.film.id).then((response) => {
           this._filmsModel.setComments(response.comments);
           this._filmsModel.setSubmitComplete();
-          console.log(response);
           this._filmsModel.updateFilm(response.movie);
         }).catch(() => {
           this._filmsModel.setSubmitComplete();
@@ -206,6 +205,7 @@ export default class FilmsPresenter {
           const updatedFilmAfterDelete = JSON.parse(JSON.stringify(updatedFilmData));
           updatedFilmAfterDelete.film.idComments = updatedFilmData.film.idComments.filter((item) => item !== updatedFilmData.commentId);
           this._filmsModel.deleteComment(updatedFilmData.commentId);
+          console.log(updatedFilmAfterDelete);
           this._filmsModel.updateFilm(updatedFilmAfterDelete.film, true);
           this._filmsModel.setDeleteComplete();
         }).catch(() => {

@@ -68,7 +68,7 @@ export default class Provider {
         });
     }
 
-    this._store.setItem(this._storedFilms, film.id, FilmsModel.adaptToServer(Object.assign({}, film)));
+    this._store.setItem(this._storedFilms, film.id, Object.assign({}, film));
 
     return Promise.resolve(film);
   }
@@ -92,6 +92,7 @@ export default class Provider {
         .then(() => this._store.removeItem(this._storedComments, filmId, commentId));
     }
 
+    this._store.removeItem(this._storedComments, filmId, commentId);
     return Promise.reject(new Error('Delete comment failed'));
   }
 
