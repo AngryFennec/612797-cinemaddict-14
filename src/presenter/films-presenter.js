@@ -140,11 +140,11 @@ export default class FilmsPresenter {
   }
 
   _renderFilmCards(container, films, filmsPresenters) {
-    for (let i = 0; i < films.length; i++) {
-      const filmCardPresenter = new FilmCardPresenter(films[i], container, this._updateData, this._filmsModel, this._api);
+    films.forEach((item) => {
+      const filmCardPresenter = new FilmCardPresenter(item, container, this._updateData, this._filmsModel, this._api);
       filmCardPresenter.init();
       filmsPresenters.push(filmCardPresenter);
-    }
+    });
   }
 
   _renderShowMoreButton(iterator) {
