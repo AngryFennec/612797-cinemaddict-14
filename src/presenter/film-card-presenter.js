@@ -21,6 +21,7 @@ export default class FilmCardPresenter {
     this._changeData = this._changeData.bind(this);
     this._emoji = null;
     this._comment = '';
+    this._isOfflineFormSubmit = false;
   }
 
   init(updatedData) {
@@ -43,8 +44,7 @@ export default class FilmCardPresenter {
   }
 
   _openPopup() {
-
-    if (document.body.querySelector('.film-details')) {
+    if (!this._isPopupOpen && document.body.querySelector('.film-details')) {
       document.body.removeChild(document.body.querySelector('.film-details'));
     }
 
@@ -52,8 +52,6 @@ export default class FilmCardPresenter {
       this._filmsModel.setComments(response);
       this._popup = this._popup || new Popup(this._prepareFilmToPopup(this._film));
       this._isPopupOpen = true;
-
-
       document.body.appendChild(this._popup.getElement());
       this._setPopupHandlers();
       document.body.classList.add('hide-overflow');
@@ -62,12 +60,14 @@ export default class FilmCardPresenter {
   }
 
   _closePopup() {
+    this._emoji = null;
+    this._comment = '';
+    this._popup.updateData(this._prepareFilmToPopup(this._film));
     this._popup.getElement().remove();
     this._isPopupOpen = false;
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._onCloseEscPress);
-    this._emoji = null;
-    this._comment = '';
+
   }
 
   _setPopupHandlers() {
@@ -104,12 +104,15 @@ export default class FilmCardPresenter {
         }
 
         if (!isOnline()) {
-          toast('You can\'t save comment offline');
+          this._isOfflineFormSubmit = true;
           this._filmsModel.setSubmitComplete();
+          this._filmsModel.updateFilm(this._film, true);
           this._filmsModel.setRequestErrorReaction();
-          this._filmsModel.updateFilm(this._film, true);
-          this._filmsModel.removeRequestErrorReaction();
-          this._filmsModel.updateFilm(this._film, true);
+          toast('You can\'t save comment offline');
+          setTimeout(() => {
+            this._filmsModel.removeRequestErrorReaction();
+            this._isOfflineFormSubmit = false;
+          }, 200);
           return;
         }
 
@@ -165,7 +168,6 @@ export default class FilmCardPresenter {
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
-    console.log(this._film);
     this._changeData(PopupAction.UPDATE_MOVIE, this._film);
   }
 
@@ -181,7 +183,7 @@ export default class FilmCardPresenter {
           id: this._filmsModel.modifiedCommentId,
           isDeleteInProgress: this._filmsModel.isDeleteInProgress,
           isSubmitInProgress: this._filmsModel.isSubmitInProgress,
-          isRequestError: this._filmsModel.isRequestError,
+          isRequestError: this._filmsModel.isRequestError || (!isOnline() && this._isOfflineFormSubmit),
         },
       },
     );
