@@ -54,7 +54,8 @@ export default class FilmsPresenter {
   }
 
   init() {
-    // меню
+    this._renderProfile();
+      // меню
     const filterPresenter = new FilterPresenter(this._filmsContainer, this._filterModel, this._filmsModel);
     filterPresenter.init();
     //сортировка
