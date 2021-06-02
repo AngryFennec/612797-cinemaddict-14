@@ -43,10 +43,17 @@ export default class FilmCardPresenter {
   }
 
   _openPopup() {
+
+    if (document.body.querySelector('.film-details')) {
+      document.body.removeChild(document.body.querySelector('.film-details'));
+    }
+
     this._api.getComments(this._film.id).then((response) => {
       this._filmsModel.setComments(response);
       this._popup = this._popup || new Popup(this._prepareFilmToPopup(this._film));
       this._isPopupOpen = true;
+
+
       document.body.appendChild(this._popup.getElement());
       this._setPopupHandlers();
       document.body.classList.add('hide-overflow');
@@ -158,6 +165,7 @@ export default class FilmCardPresenter {
         this._film.userDetails.favorite = !this._film.userDetails.favorite;
         break;
     }
+    console.log(this._film);
     this._changeData(PopupAction.UPDATE_MOVIE, this._film);
   }
 

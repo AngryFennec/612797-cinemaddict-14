@@ -5,5 +5,5 @@ export const getRandomString = (length) => {
 };
 
 export const getShortDescription = (description) => {
-  return description.length <= MAX_DESCRIPTION ? description : `${description.substring(0, MAX_DESCRIPTION)}...`;
+  return description.length <= MAX_DESCRIPTION ? description : `${description.substring(0, MAX_DESCRIPTION-1)}...`;
 };
