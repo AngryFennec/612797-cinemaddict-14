@@ -13,6 +13,9 @@ const createGenresTemplate = (genres) => {
 };
 
 const createCommentTemplate = (comment, isDeleteInProgress, deletingCommentId) => {
+  if (!comment) {
+    return;
+  }
   return `<li class="film-details__comment">
                 <span class="film-details__comment-emoji">
                   <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
